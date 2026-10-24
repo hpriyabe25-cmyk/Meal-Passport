@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meal Passport</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#23211f;--mute:#6a645d;--line:#e6e0d7;--red:#b5122a;--redsoft:#fbe8eb;--ok:#1d6e47;--oksoft:#e2f1e8;--warn:#8f5a08;--warnsoft:#fbefd9;--info:#25557f;--infosoft:#e3edf6;--alt:#6b3f7a;--altsoft:#f0e6f4;--onred:#fff;--r:12px;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171513;--card:#211e1b;--ink:#f3eee8;--mute:#aaa299;--line:#37322d;--red:#ff6a80;--redsoft:#3c1c22;--ok:#66d49c;--oksoft:#16301f;--warn:#f0b254;--warnsoft:#3a2d14;--info:#7fb6e8;--infosoft:#172a3b;--alt:#d5a4e6;--altsoft:#2e1c36;--onred:#1c1b1f}}
+:root[data-theme="dark"]{--bg:#171513;--card:#211e1b;--ink:#f3eee8;--mute:#aaa299;--line:#37322d;--red:#ff6a80;--redsoft:#3c1c22;--ok:#66d49c;--oksoft:#16301f;--warn:#f0b254;--warnsoft:#3a2d14;--info:#7fb6e8;--infosoft:#172a3b;--alt:#d5a4e6;--altsoft:#2e1c36;--onred:#1c1b1f}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+.in,.wrap{max-width:1040px;margin:0 auto;padding-left:16px;padding-right:16px}.wrap{padding-top:20px;padding-bottom:56px}
+.top{background:var(--card);border-bottom:1px solid var(--line)}.top .in{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:12px;padding-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center}.brand svg{width:36px;height:36px;flex:none}.brand b{font-size:19px;font-weight:800;letter-spacing:-.02em;display:block;line-height:1.2}.brand span{font-size:13px;color:var(--mute)}
+.mode{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--bg)}
+.mbtn{border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:var(--mute);padding:8px 16px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
+.mbtn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+nav{background:var(--card);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;font:inherit;font-size:14px;font-weight:700;color:var(--mute);cursor:pointer;white-space:nowrap;transition:color .15s}
+.tab:hover{color:var(--ink)}.tab[aria-selected=true]{color:var(--ink);border-color:var(--red)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+section:not(.hide){animation:fade .25s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.grid{display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
+@media(min-width:820px){.grid{grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:32px}#crew:not(.hide){display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}}
+.phone{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 1px 2px rgba(35,33,31,.04),0 8px 24px rgba(35,33,31,.05)}
+.flight{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px}
+.route{font-size:26px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}.route i{display:block;width:44px;height:2px;background:var(--line);position:relative}.route i:after{content:"";position:absolute;right:-1px;top:-3px;width:8px;height:8px;border-top:2px solid var(--mute);border-right:2px solid var(--mute);transform:rotate(45deg)}
+.fmeta{color:var(--mute);font-size:13px;margin:0 0 16px}
+ol.steps{list-style:none;margin:0 0 6px;padding:0;display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+ol.steps:before{content:"";position:absolute;left:10%;right:10%;top:8px;height:2px;background:var(--line)}
+ol.steps:after{content:"";position:absolute;left:10%;top:8px;height:2px;width:calc(80% * var(--p,0));background:var(--red);transition:width .4s ease}
+ol.steps li{position:relative;z-index:1;text-align:center;font-size:11.5px;font-weight:600;color:var(--mute);line-height:1.3;padding:0 2px}
+ol.steps i{display:block;width:18px;height:18px;margin:0 auto 6px;border-radius:50%;background:var(--card);border:2px solid var(--line)}
+ol.steps li.done i{background:var(--red);border-color:var(--red)}ol.steps li.now i{border-color:var(--red);box-shadow:0 0 0 4px var(--redsoft)}ol.steps li.now{color:var(--ink);font-weight:800}
+.clockline{font-size:13px;color:var(--mute);margin:10px 0 18px;padding-top:12px;border-top:1px solid var(--line)}
+h2{font-size:20px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}h3{font-size:14px;font-weight:700;margin:20px 0 8px}
+p{margin:0 0 10px}.mute{color:var(--mute);font-size:14px}.ok{color:var(--ok);font-size:14px;font-weight:600;min-height:22px;margin:10px 0 0}
+#screen.in{animation:fade .3s ease-out}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+.chip:hover{border-color:var(--mute)}.chip:active{transform:scale(.97)}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed=true]:before{content:"\2713\00a0"}
+.btn{display:block;width:100%;background:var(--red);color:var(--onred);border:0;border-radius:var(--r);padding:14px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;margin-top:16px;transition:filter .15s,transform .1s}
+.btn:hover:not(:disabled){filter:brightness(.92)}.btn:active:not(:disabled){transform:scale(.99)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.pass{display:grid;grid-template-columns:1fr auto;margin:18px 0;background:var(--bg);border:1px solid var(--line);border-radius:14px;position:relative}
+.pass .pm{padding:14px 16px}.pass .ps{padding:14px 16px;border-left:2px dashed var(--line);text-align:center;min-width:104px}
+.pass:before,.pass:after{content:"";position:absolute;right:92px;width:14px;height:14px;background:var(--card);border:1px solid var(--line);border-radius:50%}.pass:before{top:-8px}.pass:after{bottom:-8px}
+.pass small{display:block;color:var(--mute);font-size:12px}.pass b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.25}.pass span{font-size:13px;color:var(--mute)}
+.cut{display:inline-block;background:var(--infosoft);color:var(--info);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:700;margin:0}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge:before{margin-right:5px}.b-ok{background:var(--oksoft);color:var(--ok)}.b-ok:before{content:"\2713"}.b-warn{background:var(--warnsoft);color:var(--warn)}.b-warn:before{content:"\25CB"}.b-red{background:var(--redsoft);color:var(--red)}.b-red:before{content:"\2715"}.b-info{background:var(--infosoft);color:var(--info)}.b-info:before{content:"\25C6"}.b-alt{background:var(--altsoft);color:var(--alt)}.b-alt:before{content:"\2605"}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.demo{border:1px dashed var(--mute);border-radius:16px;padding:18px;margin-bottom:20px;background:transparent}.demo h2{font-size:16px}
+.side>.panel{border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:20px 0 0}
+.status{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.status h3{margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mute);font-weight:600;font-size:13px}
+#fcrows td:nth-child(n+2),#fc th:nth-child(n+2){text-align:right}
+.tw{overflow-x:auto}
+.alert{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:14px;margin-bottom:10px;font-size:14px}
+.alert.open{border-left:4px solid var(--warn)}.alert p{margin:6px 0}
+.mtag{display:inline-block;font-weight:700;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0 8px;margin:0 6px}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;color:var(--mute);font-size:14px}
+label{display:block;font-size:14px;margin:14px 0 4px;font-weight:700}input[type=range]{width:100%;accent-color:var(--red)}
+.kpi{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}.kpi div{flex:1;min-width:130px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}.kpi b{font-size:28px;font-weight:800;display:block;letter-spacing:-.02em}.kpi span{font-size:13px;color:var(--mute)}
+.hide{display:none!important}
+.step:disabled{opacity:.5}
+.prof{margin-top:20px;border-top:1px solid var(--line);padding-top:12px}.prof summary{cursor:pointer;font-weight:700;padding:4px 0}
+.lockbox{max-width:420px;margin:24px auto}.err{color:var(--red);font-size:14px;min-height:22px;margin:6px 0 0;font-weight:600}
+input[type=password]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--bg);color:var(--ink);letter-spacing:.08em}
+.rnote{margin:8px 0 0}
+.stock{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.stk{display:inline-flex;align-items:center;gap:10px}.stk .q{font-size:24px;min-width:2ch;text-align:center}
+.sb{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:20px;font-weight:700;line-height:1;cursor:pointer}
+.sb:hover:not(:disabled){border-color:var(--ink)}.sb:disabled{opacity:.4;cursor:not-allowed}
+.abtn{border:0;background:var(--red);color:var(--onred);border-radius:10px;padding:11px 16px;min-height:44px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:filter .15s}
+.abtn:hover{filter:brightness(.92)}.abtn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.conf{align-items:center;margin-top:10px}.conf span{font-weight:700;margin-right:4px}
+textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink);resize:vertical}textarea:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.watch{margin:0 0 12px;padding-left:20px}.watch li{margin-bottom:8px;font-size:15px}
+.guide dl{margin:0 0 8px}.guide dt{font-weight:800;margin-top:14px}.guide dd{margin:2px 0 0;color:var(--mute);font-size:15px;max-width:60ch}
+.fish{border:2px solid var(--ink);border-left:10px solid var(--f-vegan,#12767b);background:var(--infosoft);padding:10px 12px;margin:12px 0;font-size:14px}
+/* humanised pass: fewer boxes, more paper-and-whitespace */
+.top,nav{background:transparent}
+.phone{background:none;border:0;box-shadow:none;padding:4px 0 0}
+.panel{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:22px 0 8px;margin-bottom:12px}
+.panel.lockbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.demo{background:var(--warnsoft);border:0;border-radius:6px;padding:16px 18px}
+#screen .chips{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+@media(max-width:420px){#screen .chips{grid-template-columns:1fr}}
+#screen .chip,#screen .chip[aria-pressed=true]{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;color:var(--ink);border:0;border-bottom:1px solid var(--line);border-radius:0;padding:13px 2px;font-size:15px;font-weight:500}
+#screen .chip:hover{background:none;border-bottom-color:var(--mute)}
+#screen .chip:before,#screen .chip[aria-pressed=true]:before{content:"";flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--mute);display:inline-grid;place-items:center;font-size:12px;color:var(--onred);line-height:1}
+#screen .chip[aria-pressed=true]{font-weight:800}
+#screen .chip[aria-pressed=true]:before{content:"\2713";background:var(--red);border-color:var(--red)}
+#screen .chip.x:before,#screen .chip.x[aria-pressed=true]:before{border-radius:5px}
+.pass{background:var(--warnsoft);border:1px solid transparent;border-radius:10px}
+.pass:before,.pass:after{background:var(--bg);border:0}
+.btn,.abtn{border-radius:8px}.btn{font-weight:700}
+.alert{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:16px 0}
+.alert.open{padding-left:14px;box-shadow:inset 3px 0 0 var(--warn)}
+.mtag{background:none;border:0;padding:0;margin:0 10px;font-weight:800;font-size:16px}
+.empty{border:0;text-align:left;padding:6px 0;font-style:italic}
+.kpi div{background:none;border:0;padding:0 12px 0 0}.kpi b{font-size:34px}
+.sb{border-radius:8px}
+.prof{border-top:0}
+:root{--c-jain:#d98a1c;--c-veg:#3f9b5b;--c-vegan:#1f9aa0;--c-halal:#2f6fb5;--c-diabetic:#8a5cc2;--c-no-beef:#b2623a;--c-regular:#7d766d}
+#screen .chip[data-v="Jain"]:before{border-color:var(--c-jain)}#screen .chip[aria-pressed=true][data-v="Jain"]:before{background:var(--c-jain);border-color:var(--c-jain)}
+#screen .chip[data-v="Veg"]:before{border-color:var(--c-veg)}#screen .chip[aria-pressed=true][data-v="Veg"]:before{background:var(--c-veg);border-color:var(--c-veg)}
+#screen .chip[data-v="Vegan"]:before{border-color:var(--c-vegan)}#screen .chip[aria-pressed=true][data-v="Vegan"]:before{background:var(--c-vegan);border-color:var(--c-vegan)}
+#screen .chip[data-v="Halal"]:before{border-color:var(--c-halal)}#screen .chip[aria-pressed=true][data-v="Halal"]:before{background:var(--c-halal);border-color:var(--c-halal)}
+#screen .chip[data-v="Diabetic"]:before{border-color:var(--c-diabetic)}#screen .chip[aria-pressed=true][data-v="Diabetic"]:before{background:var(--c-diabetic);border-color:var(--c-diabetic)}
+#screen .chip[data-v="No beef"]:before{border-color:var(--c-no-beef)}#screen .chip[aria-pressed=true][data-v="No beef"]:before{background:var(--c-no-beef);border-color:var(--c-no-beef)}
+#screen .chip[data-v="Regular"]:before{border-color:var(--c-regular)}#screen .chip[aria-pressed=true][data-v="Regular"]:before{background:var(--c-regular);border-color:var(--c-regular)}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(1):before{background:var(--c-jain)}.guide h3:nth-of-type(1)+dl dt:nth-of-type(2):before{background:var(--c-veg)}.guide h3:nth-of-type(1)+dl dt:nth-of-type(3):before{background:var(--c-vegan)}.guide h3:nth-of-type(1)+dl dt:nth-of-type(4):before{background:var(--c-halal)}.guide h3:nth-of-type(1)+dl dt:nth-of-type(5):before{background:var(--c-diabetic)}.guide h3:nth-of-type(1)+dl dt:nth-of-type(6):before{background:var(--c-no-beef)}.guide h3:nth-of-type(1)+dl dt:nth-of-type(7):before{background:var(--c-regular)}
+.guide h3:nth-of-type(1)+dl dt:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:10px}
+.top{border-top:4px solid var(--red)}
+.pass{border-left:6px solid var(--mc,var(--red))}.pass .pm b{color:var(--mc,var(--ink))}
+.kpi b{color:var(--red)}
+.tab[aria-selected=true]{color:var(--red)}
+.cut{background:var(--infosoft)}
+ol.steps li.now{color:var(--red)}
+:root{--f-jain:#9a5b00;--f-veg:#2b7a45;--f-vegan:#12767b;--f-halal:#2a5fa0;--f-diabetic:#7447a8;--f-no-beef:#99502b;--f-regular:#5f5951}
+/* blocky pass */
+.top{background:var(--red);border:0}.brand b,.brand span{color:var(--onred)}.brand svg rect{fill:var(--onred)}.brand svg path{stroke:var(--red)}
+.mode{border:2px solid var(--onred);border-radius:0;background:transparent}.mbtn{border-radius:0;color:var(--onred)}.mbtn[aria-pressed=true]{background:var(--onred);color:var(--red)}
+nav{background:transparent;border:0}.tabs{gap:8px;padding:14px 0 2px}
+.tab{border:2px solid var(--ink);border-bottom-width:2px;background:var(--card);color:var(--ink)}.tab:hover{background:var(--warnsoft)}.tab[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.wrap:before{content:"";display:block;height:14px;margin-bottom:22px;background:linear-gradient(90deg,var(--f-jain) 0.0% 14.29%,var(--f-veg) 14.29% 28.57%,var(--f-vegan) 28.57% 42.86%,var(--f-halal) 42.86% 57.14%,var(--f-diabetic) 57.14% 71.43%,var(--f-no-beef) 71.43% 85.71%,var(--f-regular) 85.71% 100.0%)}
+.phone{background:var(--card);border:3px solid var(--ink);border-radius:0;padding:22px;box-shadow:8px 8px 0 var(--ink)}
+.panel{background:var(--card);border:2px solid var(--ink);border-radius:0;padding:20px;margin-bottom:24px;box-shadow:6px 6px 0 var(--ink)}
+.side>.panel{border:2px solid var(--ink);border-radius:0;background:var(--card);padding:20px}
+.panel.lockbox{border-radius:0;border:2px solid var(--ink)}
+.demo{border:2px dashed var(--ink);border-radius:0;background:var(--warnsoft)}
+h2{font-size:24px;display:inline-block;border-bottom:4px solid var(--red);margin-bottom:10px;line-height:1.2}
+.route i{height:4px;background:var(--ink)}
+.badge{border-radius:0;border:2px solid currentColor}
+#screen .chips{gap:10px;column-gap:10px}
+#screen .chip{border:2px solid var(--ink);border-left-width:2px;border-radius:0;background:var(--card);padding:16px 14px;font-weight:800;font-size:16px;box-shadow:4px 4px 0 var(--ink);transition:transform .1s,box-shadow .1s}
+#screen .chip:hover{background:var(--warnsoft);border-bottom-color:var(--ink)}
+#screen .chip:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+#screen .chip[aria-pressed]:before{display:none}
+#screen .chip[aria-pressed=true]{background:var(--ink);color:var(--bg);font-weight:800}
+#screen .chip[aria-pressed=true]:before,#screen .chip[aria-pressed=true][data-v]:before{display:inline;content:"\2713";width:auto;height:auto;border:0;background:none;color:inherit;font-size:16px}
+#screen .chip[data-v="Jain"]{border-left:16px solid var(--f-jain)}#screen .chip[aria-pressed=true][data-v="Jain"]{background:var(--f-jain);color:#fff}
+#screen .chip[data-v="Veg"]{border-left:16px solid var(--f-veg)}#screen .chip[aria-pressed=true][data-v="Veg"]{background:var(--f-veg);color:#fff}
+#screen .chip[data-v="Vegan"]{border-left:16px solid var(--f-vegan)}#screen .chip[aria-pressed=true][data-v="Vegan"]{background:var(--f-vegan);color:#fff}
+#screen .chip[data-v="Halal"]{border-left:16px solid var(--f-halal)}#screen .chip[aria-pressed=true][data-v="Halal"]{background:var(--f-halal);color:#fff}
+#screen .chip[data-v="Diabetic"]{border-left:16px solid var(--f-diabetic)}#screen .chip[aria-pressed=true][data-v="Diabetic"]{background:var(--f-diabetic);color:#fff}
+#screen .chip[data-v="No beef"]{border-left:16px solid var(--f-no-beef)}#screen .chip[aria-pressed=true][data-v="No beef"]{background:var(--f-no-beef);color:#fff}
+#screen .chip[data-v="Regular"]{border-left:16px solid var(--f-regular)}#screen .chip[aria-pressed=true][data-v="Regular"]{background:var(--f-regular);color:#fff}
+.btn,.abtn,.sb,textarea,input[type=password]{border-radius:0}
+.btn{border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink);font-weight:800;transition:transform .1s,box-shadow .1s}
+.btn:hover:not(:disabled){filter:none;transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink)}.btn:active:not(:disabled){transform:translate(5px,5px);box-shadow:0 0 0 var(--ink)}
+.btn.alt{background:var(--card);color:var(--ink)}
+.abtn{border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}.abtn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.chip.jump,#clk-live,#clk-sim{border:2px solid var(--ink);border-radius:0;padding:8px 12px}
+.pass{border:3px solid var(--ink);border-left:3px solid var(--ink);border-radius:0;background:var(--warnsoft)}
+.pass:before,.pass:after{display:none}
+.pass .pm b{color:var(--ink);font-size:28px}
+.pass .ps{background:var(--mc,var(--ink));border-left:3px solid var(--ink);color:#fff}.pass .ps small,.pass .ps b,.pass .ps span{color:#fff}
+.cut{border:2px solid var(--info);border-radius:0}
+.alert{border:2px solid var(--ink);border-radius:0;background:var(--card);padding:14px;margin-bottom:12px}
+.alert.open{background:var(--warnsoft);box-shadow:inset 10px 0 0 var(--warn);padding-left:24px}
+.mtag{font-size:16px}
+.empty{border:2px dashed var(--ink);font-style:normal;padding:16px}
+table{border:2px solid var(--ink)}th{background:var(--ink);color:var(--bg);font-weight:700}td{border-bottom:1px solid var(--ink)}
+.kpi div{border:2px solid var(--ink);background:var(--card);padding:12px 14px}.kpi div:nth-child(1){background:var(--warnsoft)}.kpi div:nth-child(2){background:var(--infosoft)}.kpi div:nth-child(3){background:var(--oksoft)}.kpi b{color:var(--ink)}
+.stock{border:2px solid var(--ink);padding:10px 12px;margin-bottom:10px;background:var(--card)}
+.sb{border:2px solid var(--ink);background:var(--warnsoft)}.sb:hover:not(:disabled){background:var(--ink);color:var(--bg)}
+textarea,input[type=password]{border:2px solid var(--ink)}
+.guide dt{display:inline-block;background:var(--ink);color:var(--bg);padding:2px 12px;margin-top:20px}.guide dd{margin-top:8px}
+.guide dt:before{display:none}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(1){background:var(--f-jain);color:#fff}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(2){background:var(--f-veg);color:#fff}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(3){background:var(--f-vegan);color:#fff}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(4){background:var(--f-halal);color:#fff}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(5){background:var(--f-diabetic);color:#fff}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(6){background:var(--f-no-beef);color:#fff}
+.guide h3:nth-of-type(1)+dl dt:nth-of-type(7){background:var(--f-regular);color:#fff}
+/* boarding pass restored to original look */
+.pass{border:1px solid var(--line);border-left:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.pass:before,.pass:after{display:block;background:var(--card);border:1px solid var(--line)}
+.pass .pm b{color:var(--ink);font-size:24px}
+.pass .ps{background:none;border-left:2px dashed var(--line)}
+.pass .ps small,.pass .ps span{color:var(--mute)}.pass .ps b{color:var(--ink)}
+/* boarding pass v3: airline-style ticket with colour header and barcode strip */
+.pass{border:1px solid var(--ink);border-radius:12px;background:var(--card);overflow:hidden;margin:18px 0}
+.pass .bph{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;background:var(--mc,var(--ink));color:#fff;padding:9px 16px;font-size:13px;font-weight:700}
+.pass .bph span{color:#fff;font-size:13px}
+.pass:before,.pass:after{display:block;background:var(--bg);border:1px solid var(--ink);right:92px;width:16px;height:16px}.pass:before{top:-9px}.pass:after{bottom:-9px}
+.pass .pm b{font-size:26px}
+.pass .ps{border-left:2px dashed var(--mute)}
+.pass .bpc{grid-column:1/-1;height:30px;margin:2px 16px 14px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 8px,var(--ink) 8px 11px,transparent 11px 14px)}
+.hr{display:flex;gap:10px;flex-wrap:wrap;align-items:center}body{font-family:Manrope,"Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans-serif}
+.stamps{display:flex;flex-wrap:wrap;gap:18px;margin-top:6px}.stamp{text-align:center;font-size:14px;min-width:88px}.stamp b{display:block;margin-top:8px}.stamp span{display:block;color:var(--mute);font-size:12px}
+.hanko{--rot:-8deg;width:74px;height:74px;margin:0 auto;border:3px solid var(--red);border-radius:50%;color:var(--red);display:grid;place-items:center;font:900 36px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;box-shadow:inset 0 0 0 4px var(--card),inset 0 0 0 6px var(--red);transform:rotate(var(--rot));opacity:.92}
+.hanko.sq{--rot:6deg;border-radius:6px}
+.stamp.new .hanko{animation:press .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes press{from{transform:scale(2.4) rotate(calc(var(--rot) - 18deg));opacity:0}to{transform:rotate(var(--rot));opacity:.92}}
+.seal{display:inline-grid;place-items:center;width:22px;height:22px;margin-left:8px;border:2px solid currentColor;border-radius:4px;font:900 13px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-style:normal;vertical-align:2px;transform:rotate(-6deg)}
+.foot{display:flex;gap:10px;justify-content:center;align-items:center;padding:8px 16px 40px;color:var(--red);font-weight:700}.foot .seal{margin:0;width:28px;height:28px;font-size:16px}
+.kj{font-weight:600;opacity:.9;margin-left:6px}
+.pass .pm{position:relative;padding-right:34px}.vk{position:absolute;right:10px;top:12px;writing-mode:vertical-rl;font-style:normal;font-size:12px;letter-spacing:.2em;color:var(--mute)}
+.fish:before{content:"\203B  ";font-weight:800}.watch li::marker{content:"\25CE  ";color:var(--red)}.phone h3:before{content:"\25C6";color:var(--red);margin-right:8px;font-size:11px;vertical-align:2px}
+.stamprow{position:absolute;right:12px;bottom:4px;display:flex;pointer-events:none}
+.hanko.mini{width:56px;height:56px;font-size:28px;margin:0 0 0 -14px;border-width:3px;box-shadow:inset 0 0 0 3px var(--card),inset 0 0 0 5px var(--red)}
+.hanko.new{animation:press .5s cubic-bezier(.2,1.3,.4,1)}
+.ppt{margin:18px 0;border:2px solid var(--ink);border-radius:10px;background:var(--warnsoft);overflow:hidden}
+.pph{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);color:var(--bg);padding:9px 14px;font-weight:800;font-size:14px}.pph .kj{font-weight:600;opacity:.85;margin:0}
+.ppg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px;background-image:repeating-linear-gradient(0deg,transparent 0 11px,rgba(0,0,0,.035) 11px 12px)}
+.slot{min-height:96px;border:1.5px dashed var(--mute);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--mute);padding:4px}
+.slot i{font-style:normal;font-size:22px;opacity:.35;font-weight:800}.slot.on{border-style:solid;border-color:transparent}.slot small{display:block;line-height:1.25}
+.slot .hanko{width:54px;height:54px;font-size:27px;border-width:3px;box-shadow:inset 0 0 0 3px var(--warnsoft),inset 0 0 0 5px var(--red);margin:0 0 4px}
+.ppnote{margin:0;padding:0 14px 8px;font-size:12px}
+.mrz{font:600 11px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.12em;padding:8px 14px;border-top:1px solid var(--line);color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* passport v2: booklet page */
+.ppt{--paper:#f3ead6;--pink:#2b2620;--pmute:#6b5f4d;--slotbg:rgba(255,255,255,.45);--wave:rgba(140,100,50,.14);position:relative;background:var(--paper);color:var(--pink);border:1px solid #3a342c;border-left:12px solid var(--ink);border-radius:4px 16px 16px 4px;box-shadow:0 10px 24px rgba(35,33,31,.14)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ppt{--paper:#2c261d;--pink:#eadfca;--pmute:#b5a78e;--slotbg:rgba(0,0,0,.22);--wave:rgba(220,190,140,.12)}:root:not([data-theme="light"]) .slot .hanko{mix-blend-mode:normal}}
+:root[data-theme="dark"] .ppt{--paper:#2c261d;--pink:#eadfca;--pmute:#b5a78e;--slotbg:rgba(0,0,0,.22);--wave:rgba(220,190,140,.12)}
+.ppt:before{content:"";position:absolute;left:-7px;top:12px;bottom:12px;border-left:2px dashed rgba(255,255,255,.4)}
+.pph{justify-content:flex-start;gap:12px;padding:12px 14px;border-radius:0 13px 0 0}
+.pph .seal{margin:0;width:36px;height:36px;font-size:20px;color:var(--bg);flex:none}
+.pph .pt{flex:1;line-height:1.25}.pph .pt b{display:block;font-size:17px}.pph .kj{display:block;margin:0;font-size:12px;font-weight:600;opacity:.8}
+.cnt{text-align:right;font-weight:800;font-size:16px}.cnt small{display:block;font-size:11px;font-weight:600;opacity:.8}
+.pdata{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px;border-bottom:1px solid rgba(120,100,70,.35)}.pdata small{display:block;font-size:11px;color:var(--pmute)}.pdata b{font-size:15px}
+.ppg{position:relative;gap:10px;padding:14px;background-image:repeating-radial-gradient(circle at 50% 100%,transparent 0 6px,var(--wave) 6px 7px,transparent 7px 12px);background-size:32px 16px}
+.ppg:before{content:"食";position:absolute;inset:0;display:grid;place-items:center;font:900 140px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;color:var(--wave);opacity:.6;pointer-events:none}
+.slot{position:relative;border:0;min-height:104px;background:var(--slotbg);border-radius:8px;color:var(--pmute)}
+.slot i{display:grid;place-items:center;width:54px;height:54px;border:1.5px dashed var(--pmute);border-radius:50%;font-size:16px;opacity:.5}
+.slot small{color:var(--pmute)}.slot .hanko+small{font-weight:800;color:var(--pink);font-size:12px}
+.slot .hanko{box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 5px var(--red);mix-blend-mode:multiply}
+.ppnote{margin:0;padding:8px 14px 10px;font-size:12px;color:var(--pmute)}
+.mrz{border-top:1px dashed rgba(120,100,70,.5);background:var(--slotbg);color:var(--pink);font-size:12px;letter-spacing:.14em;line-height:1.5;white-space:nowrap;overflow:hidden;border-radius:0 0 14px 0}
+/* layout: phone | passport + how it works on top, demo controls full width below */
+#pax .side{display:contents}
+#pax .phone{order:0}#passport{order:1;min-width:0}#passport:empty{display:none}#pax .side>.panel{order:2}#pax .side>.demo{order:3}
+@media(min-width:820px){
+#pax .phone{grid-column:1;grid-row:1/span 2}
+#passport{grid-column:2;grid-row:1;align-self:start}
+#passport .ppt{margin:0}#passport .bento:first-child{margin-top:0}#passport .omi{margin:16px 0 0}
+#pax .side>.panel{grid-column:2;grid-row:2;margin-bottom:0;align-self:start}
+#pax:has(#passport:empty) .side>.panel{grid-row:1}
+#pax .side>.demo{grid-column:1/-1;grid-row:3}}
+/* Japan: scene, say-it card, sakura, toast */
+.scene{position:relative;height:120px;margin:0 0 16px;border:2px solid var(--ink);overflow:hidden}.scene svg{display:block;width:100%;height:100%}
+.scene .sky{fill:var(--warnsoft)}.scene .sea{fill:var(--warnsoft);opacity:.85}.scene .fuji{fill:var(--mute);opacity:.6}.scene .snow{fill:var(--card)}.scene .sun{fill:var(--red)}.scene .halo{fill:var(--red);opacity:.18}.sgl{fill:none;stroke:var(--ink);stroke-width:1.2;opacity:.35}
+.sunq{transform:translate(calc(var(--s,0)*-14px),calc(92px - var(--s,0)*16px));transition:transform 1.2s ease}
+.scene .cap{position:absolute;left:12px;top:8px;line-height:1.25;color:var(--ink)}.cap b{display:block;font:900 20px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}.cap span{display:block;font-size:11px;font-weight:700}.cap span+span{font-weight:600;opacity:.8}
+.say{margin:22px 0 6px;border:2px solid var(--ink);background:var(--card);box-shadow:5px 5px 0 var(--ink);padding:0 14px 12px}
+.noren{display:flex;gap:4px;margin:0 -14px 12px;height:30px}.noren i{flex:1;display:grid;place-items:center;background:var(--red);color:var(--onred);border-radius:0 0 5px 5px;font:900 15px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-style:normal}
+.say h3{margin-top:0}.say ul{list-style:none;margin:10px 0 0;padding:0}.say li{padding:9px 0;border-bottom:1px dashed var(--line)}.say li:last-child{border:0}
+.say li b{display:block;font:800 17px/1.5 "Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}.say li span{display:block;font-size:12px;color:var(--mute);font-style:italic}
+.manner{margin:10px 0 0;padding-left:18px;font-size:13px}.manner li::marker{content:"\2756  ";color:var(--red)}
+.sakura{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}.sakura i{position:absolute;top:-20px;background:#f4a9bb;border-radius:0 100% 0 100%;opacity:.7;animation:fall linear infinite}
+@keyframes fall{from{transform:translate(0,0) rotate(0)}to{transform:translate(var(--d),110vh) rotate(540deg)}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:12px 22px;text-align:center;box-shadow:5px 5px 0 var(--red);animation:rise .4s ease-out}.toast b{display:block;font:900 22px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}.toast span{font-size:12px;font-weight:700}
+@keyframes rise{from{opacity:0;transform:translate(-50%,16px)}}
+.omi{display:flex;gap:14px;margin:20px 0 6px;padding:14px;border:2px solid var(--red);background:var(--card);box-shadow:5px 5px 0 var(--red)}
+.omi .k{flex:none;writing-mode:vertical-rl;font:900 40px/1.1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;color:var(--red);border-right:2px solid var(--red);padding-right:12px;text-align:center}
+.omi h3{margin:0 0 4px}.omi p{margin:4px 0}.omi .sw{display:inline-block;width:12px;height:12px;border:1.5px solid var(--ink);vertical-align:-1px;margin-right:6px}
+.bento{margin:16px 0 6px;border:2px solid var(--ink);padding:12px;background:var(--card);box-shadow:5px 5px 0 var(--ink)}.bento h3{margin:0 0 8px}.bento svg{display:block;width:100%;max-width:380px;margin:0 auto 10px}
+.bento .bx{fill:var(--card);stroke:var(--ink);stroke-width:3}.bento .bc{fill:var(--warnsoft);stroke:var(--ink);stroke-width:2}.bento .bm{fill:var(--mc);stroke:#23211f;stroke-width:1.6}.bento .bg{fill:#3f9b5b;stroke:#23211f;stroke-width:1.4}.bento .bo{fill:#e8892b;stroke:#23211f;stroke-width:1.6}
+.bi{transform-box:fill-box;transform-origin:center;animation:pop .45s cubic-bezier(.2,1.3,.4,1) both}@keyframes pop{from{transform:scale(.3);opacity:0}}
+.bl{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:0}.bl div{font-size:12px;line-height:1.35}.bl b{font:900 14px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;color:var(--red)}.bl i{color:var(--mute);margin-left:4px;font-size:11px}.bl span{display:block}.bento .n{margin:10px 0 0;font-size:11px;color:var(--mute)}
+.jpr{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.jpr button{font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border:2px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer}.jpr button:hover{background:var(--warnsoft)}.jpr button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.jpg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:14px}.dish{border:2px solid var(--ink);background:var(--card);box-shadow:5px 5px 0 var(--mc,var(--ink));padding:14px}.dish .k{display:block;font:900 24px/1.25 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;color:var(--red)}.dish i{display:block;font-size:12px;color:var(--mute)}.dish p{margin:8px 0 0;font-size:13px}.dish .ask{border-top:1px dashed var(--line);padding-top:8px;font-size:12px}
+@media(prefers-reduced-motion:reduce){.sakura{display:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style></head><body>
+<header class="top"><div class="in"><div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#b5122a"/><path d="M9 11h14v4a2 2 0 0 0 0 4v4H9v-4a2 2 0 0 0 0-4z" fill="none" stroke="#fff" stroke-width="1.8"/></svg><div><b>Meal Passport<i class="seal" aria-hidden="true">食</i></b><span>Your meal, on every stage of the journey</span></div></div>
+<div class="hr"><div class="mode" role="group" aria-label="Language"><button class="mbtn" id="l-en" aria-pressed="true" lang="en">EN</button><button class="mbtn" id="l-ja" aria-pressed="false" lang="ja">日本語</button></div><div class="mode" role="group" aria-label="Choose view"><button class="mbtn" id="m-pax" aria-pressed="true">Passenger view</button><button class="mbtn" id="m-crew" aria-pressed="false">Crew sign in</button></div></div></div></header>
+<nav id="nav"><div class="in"><div class="tabs" role="tablist">
+<button class="tab" role="tab" aria-selected="true" data-t="pax" data-r="pax">Passenger app</button>
+<button class="tab" role="tab" aria-selected="false" data-t="ground" data-r="crew">Ground &amp; catering</button>
+<button class="tab" role="tab" aria-selected="false" data-t="crew" data-r="crew">Crew dashboard</button>
+<button class="tab" role="tab" aria-selected="false" data-t="fc" data-r="crew">Demand forecast</button>
+<button class="tab" role="tab" aria-selected="false" data-t="guide" data-r="all">Meal guide</button>
+<button class="tab" role="tab" aria-selected="false" data-t="jp" data-r="all">Eat in Japan</button>
+</div></div></nav>
+<main class="wrap">
+<section id="lock" class="hide"><div class="panel lockbox"><h2>Crew access</h2><p class="mute">Enter the crew code to open the ground, crew and forecast screens.</p><label for="code">Crew code</label><input type="password" id="code" autocomplete="off" aria-describedby="err"><p class="err" id="err" role="alert"></p><button class="btn" id="unlock">Unlock crew view</button><button class="btn alt" id="cancel">Back to passenger view</button></div></section>
+<section id="pax" class="grid">
+<div class="phone">
+<div class="scene" id="scene" aria-hidden="true"><svg viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice"><defs><pattern id="sg" width="40" height="20" patternUnits="userSpaceOnUse"><g class="sgl"><circle cx="20" cy="20" r="20"/><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="8"/><circle cx="0" cy="10" r="20"/><circle cx="0" cy="10" r="14"/><circle cx="0" cy="10" r="8"/><circle cx="40" cy="10" r="20"/><circle cx="40" cy="10" r="14"/><circle cx="40" cy="10" r="8"/></g></pattern></defs><rect class="sky" width="400" height="120"/><g class="sunq"><circle class="halo" cx="300" cy="0" r="34"/><circle class="sun" cx="300" cy="0" r="22"/></g><path class="fuji" d="M80 120L176 42Q200 28 224 42L320 120Z"/><path class="snow" d="M176 42Q200 28 224 42L214 52L206 45L198 54L190 46L184 50Z"/><rect class="sea" y="92" width="400" height="28"/><rect y="92" width="400" height="28" fill="url(#sg)"/></svg><div class="cap" id="scenecap"></div></div>
+<div class="flight"><div class="route">DEL<i></i>HND</div><span id="stagebadge" class="badge b-info">Before journey</span></div>
+<p class="fmeta">Sample flight, seat 24A</p>
+<ol class="steps" id="steps" aria-label="Journey stage, set by the flight clock"></ol>
+<div class="clockline" id="clockline"></div>
+<div id="screen"></div>
+<div class="status"><h3>Your meal request</h3><div id="mystatus" class="mute" aria-live="polite">No meal change requested yet. You can ask for one at the airport, at boarding or in flight.</div></div>
+</div>
+<div class="side">
+<div class="demo"><h2>Demo controls</h2><p class="mute">For presenting the prototype only. Passengers never see this panel. The app normally reads the time itself and picks the stage.</p><p class="mute">Sample flight departs 22:30, flies 8 h, and catering closes 90 min before departure.</p><div class="chips"><button class="chip" id="clk-live" aria-pressed="true">Live time</button><button class="chip" id="clk-sim" aria-pressed="false">Simulate time</button></div><label for="clk">Time to departure: <span id="clkv"></span></label><input type="range" id="clk" min="-720" max="540" step="5" value="-360" disabled><div class="chips" style="margin-top:12px"><button class="chip jump" data-m="-360">Before journey</button><button class="chip jump" data-m="-150">Airport</button><button class="chip jump" data-m="-45">Boarding</button><button class="chip jump" data-m="120">In-flight</button><button class="chip jump" data-m="500">Landed</button></div></div>
+<div class="panel"><h2>How it works</h2>
+<p class="mute">Set your meal preferences once. Last-minute changes reach catering and crew. The app shows only the stage that matches the time to departure.</p>
+<div class="tw"><table><tr><th>Stage</th><th>What the passenger does</th><th>What the airline gets</th></tr>
+<tr><td>Before journey</td><td>Sets preferences once</td><td>Meal order and early demand signal</td></tr>
+<tr><td>Airport</td><td>Changes meal at lounge or gate</td><td>Catering alert before the cut-off</td></tr>
+<tr><td>Boarding</td><td>Confirms or changes</td><td>Gate staff see the open request</td></tr>
+<tr><td>In-flight</td><td>Asks the crew or app</td><td>Hot meal from buffer, or premium alternative</td></tr></table></div></div>
+</div>
+<div id="passport"></div>
+</section>
+<section id="ground" class="hide"><div class="panel"><h2>Catering and ground staff</h2><p class="mute">Requests that need attention are listed first, with the action to take.</p><p class="fish"><b>Catering note:</b> Veg, Vegan and Jain meals must be prepared without fish oil.</p><div id="galerts"><div class="empty">No requests yet. Make a change in the Passenger app and it will appear here.</div></div></div></section>
+<section id="crew" class="hide"><div><div class="panel"><h2>Cabin crew</h2><div id="calerts"></div></div>
+<div class="panel"><h2>Meal list</h2><p class="fish"><b>Reminder:</b> Veg, Vegan and Jain meals contain no fish oil.</p><div class="tw"><table><thead><tr><th>Seat</th><th>Passenger</th><th>Meal</th><th>Status</th></tr></thead><tbody id="crewrows"></tbody></table></div></div></div>
+<div class="panel"><h2>Buffer stock on board</h2><div id="buf"></div></div></section>
+<section id="fc" class="hide"><div class="panel"><h2>Meals to load</h2>
+<p class="mute">Expected demand plus a safety buffer for last-minute changes. Move the sliders to see the totals update. Shares are sample assumptions, to be replaced with survey data.</p>
+<div class="kpi" id="kpi"></div>
+<label for="pax_n">Passengers on flight: <span id="v1">280</span></label><input type="range" id="pax_n" min="100" max="400" value="280">
+<label for="chg">Expected last-minute changes: <span id="v2">8</span>%</label><input type="range" id="chg" min="0" max="25" value="8">
+<div class="tw" style="margin-top:12px"><table><thead><tr><th>Meal type</th><th>Share</th><th>Expected</th><th>Buffer</th><th>Load</th></tr></thead><tbody id="fcrows"></tbody></table></div></div></section>
+<section id="jp" class="hide"><div class="panel guide"><h2>Eat in Japan <span class="kj" lang="ja">日本の味</span></h2><p class="mute">Dishes and styles of Japanese food that tend to suit each meal type. Pick a profile to see what to try and what to watch for. These are general suggestions, so always confirm the ingredients when you order.</p><div class="jpr" id="jpr" role="group" aria-label="Meal type"></div><div id="jpb"></div></div></section>
+<section id="guide" class="hide"><div class="panel guide"><h2>Meal guide</h2><p class="mute">What each option on Meal Passport means. These are general descriptions. The airline decides exactly what goes into each meal.</p><p class="fish"><b>No fish oil.</b> Veg, Vegan and Jain meals are to be prepared without fish oil.</p><h3>Meal types</h3><dl><dt>Veg (vegetarian)</dt><dd>No meat, poultry or fish, and no fish oil. Dairy is usually included. Egg practice varies by airline.</dd><dt>Vegan</dt><dd>No animal products at all: no meat, fish, dairy, eggs or honey. No fish oil is used.</dd><dt>Jain</dt><dd>A vegetarian meal that also leaves out onion, garlic and root vegetables such as potato and carrot. Practice varies between families, so add a note if you have more specific needs. No fish oil is used.</dd><dt>Halal</dt><dd>Food permitted under Islamic dietary law: no pork, no alcohol, and meat from animals slaughtered in the prescribed way.</dd><dt>Diabetic</dt><dd>A meal planned for people with diabetes, usually lower in sugar and balanced in carbohydrates. This is a meal type, not medical advice.</dd><dt>No beef</dt><dd>Beef is left out. Other meats may be served.</dd><dt>Regular</dt><dd>The standard meal, with no dietary restriction.</dd></dl><h3>Extra needs</h3><dl><dt>No onion, garlic or root veg</dt><dd>Leaves out onion, garlic and root vegetables. Already part of the Jain meal.</dd><dt>Low sugar</dt><dd>Reduces added sugar where the airline can.</dd><dt>No egg</dt><dd>Leaves out egg and egg-based dishes.</dd><dt>Other (allergy or note)</dt><dd>A short free-text note for anything not listed, such as an allergy. The crew can see the note. For a serious allergy, please also tell the crew in person.</dd><dt>No restrictions</dt><dd>Clears your extra needs.</dd></dl></div></section>
+</main>
+<footer class="foot"><i class="seal" aria-hidden="true">旅</i><span lang="ja">良い旅を</span></footer>
+
+<script>
+var DIETS=[["Jain",.06],["Veg",.30],["Vegan",.03],["Halal",.07],["Diabetic",.05],["No beef",.08],["Regular",.41]];
+var S={stage:0,diet:"Jain",pick:"Jain",note:"",extra:["No onion, garlic or root veg"],req:null,log:[]};
+var STAGES=["Before","Airport","Boarding","In-flight"],NAMES=["Before journey","Airport","Boarding","In-flight","Landed"];
+var CREW=[["12C","A. Mehta","Veg","Confirmed"],["14A","S. Kaur","Halal","Confirmed"],["18D","R. Iyer","Diabetic","Confirmed"],["31F","K. Tanaka","Regular","Confirmed"]];
+var BUF={"Jain":2,"Veg":6,"Vegan":1,"Halal":3,"Diabetic":2};
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var DEP_H=22,DEP_M=30,DUR=480,CUT=90,AIRPORT=240,SIM=false,SIMT=-360;
+function depTime(){var n=Date.now(),d=new Date();d.setHours(DEP_H,DEP_M,0,0);d=d.getTime();if(n<d){if(n-(d-864e5)<=DUR*6e4)d-=864e5}else if(n-d>DUR*6e4)d+=864e5;return d}
+function tNow(){return SIM?SIMT:Math.round((Date.now()-depTime())/6e4)}
+function stageFor(t){return t<-AIRPORT?0:t<-CUT?1:t<0?2:t<DUR?3:4}
+function two(n){return("0"+n).slice(-2)}
+function mkSteps(){$("steps").innerHTML=NAMES.map(function(n,i){var c=i<S.stage?"done":i==S.stage?"now":"";return '<li class="'+c+'"'+(i==S.stage?' aria-current="step"':'')+'><i></i>'+n+'</li>'}).join("");$("steps").style.setProperty("--p",S.stage/4)}
+function fmt(t){var a=Math.abs(t);return "T"+(t<0?"-":"+")+Math.floor(a/60)+"h "+two(a%60)+"m"}
+function tick(){var t=tNow(),st=stageFor(t);
+ if(st!=S.stage){S.stage=st;S.pick=S.diet;S.enter=1;render()}
+ $("clockline").textContent="Departs 22:30, "+fmt(t);$("clkv").textContent=fmt(t);
+ if($("cutleft")){var m=Math.max(0,-CUT-t);$("cutleft").textContent="Catering closes in "+Math.floor(m/60)+" h "+two(m%60)+" min"}}
+function setSim(on){if(on)SIMT=Math.max(-720,Math.min(540,tNow()));SIM=on;$("clk-live").setAttribute("aria-pressed",!on);$("clk-sim").setAttribute("aria-pressed",on);$("clk").disabled=!on;$("clk").value=SIMT;tick()}
+$("clk-live").onclick=function(){setSim(false)};$("clk-sim").onclick=function(){setSim(true)};
+$("clk").oninput=function(){SIMT=+this.value;tick()};
+document.querySelectorAll(".jump").forEach(function(b){b.onclick=function(){setSim(true);SIMT=+b.dataset.m;$("clk").value=SIMT;tick()}});
+function chips(list,cur,cls){return '<div class="chips">'+list.map(function(d){return '<button class="chip '+cls+'" aria-pressed="'+(Array.isArray(cur)?cur.indexOf(d)>-1:d==cur)+'" data-v="'+d+'">'+d+'</button>'}).join("")+'</div>'}
+function toggleExtra(v){var a=S.extra.slice();
+ if(v=="No restrictions"){a=["No restrictions"]}
+ else{a=a.filter(function(x){return x!="No restrictions"});var i=a.indexOf(v);if(i>-1)a.splice(i,1);else a.push(v);if(!a.length)a=["No restrictions"]}
+ S.extra=a}
+function passCard(){return '<div class="pass" style="--mc:var(--f-'+S.diet.toLowerCase().replace(" ","-")+')"><div class="bph"><span>Meal Passport <span class="kj">ミールパスポート</span></span><span>DEL to HND</span></div><div class="pm"><small>Your meal</small><b>'+esc(S.diet)+'</b><span>'+esc(extraText())+'</span><em class="vk" aria-hidden="true">機内食</em></div><div class="ps"><small>Seat</small><b>24A</b><span>Sample flight</span></div><div class="bpc" aria-hidden="true"></div></div>'+fishNote()}
+var OTHER="Other (allergy or note)",EXTRAS=["No onion, garlic or root veg","Low sugar","No egg",OTHER,"No restrictions"];
+function hasNote(){return S.extra.indexOf(OTHER)>-1&&S.note.trim()!=""}
+function extraText(){return S.extra.map(function(x){return x==OTHER?(S.note.trim()?"Note: "+S.note.trim():"Other (details to add)"):x}).join(", ")}
+function noteBox(){return S.extra.indexOf(OTHER)>-1?'<label for="note">Tell us about your allergy or anything else</label><textarea id="note" maxlength="140" rows="2">'+esc(S.note)+'</textarea><p class="mute">The crew can see this note. For a serious allergy, please also tell the crew in person.</p>':""}
+function profEdit(){return '<details class="prof" id="prof"'+(S.profOpen?' open':'')+'><summary>Edit my meal preferences</summary>'+chips(["Jain","Veg","Vegan","Halal","Diabetic","No beef","Regular"],S.diet,"d")+'<h3>Anything else we should know?</h3><p class="mute">Select all that apply.</p>'+chips(EXTRAS,S.extra,"x")+noteBox()+'</details>'}
+function watchFor(){var w=[],d=S.diet,x=S.extra;function A(t){if(w.indexOf(t)<0)w.push(t)}
+ if(d=="Veg"||d=="Jain"||d=="Vegan"){A("Miso soup, noodle broths and simmered dishes are often made with fish stock (dashi).");A("Bonito flakes top many dishes, including takoyaki and okonomiyaki.")}
+ if(d=="Jain"||x.indexOf("No onion, garlic or root veg")>-1){A("Onion and garlic are common in sauces, curry roux and gyoza fillings.");A("Root vegetables such as daikon, carrot and burdock appear in many simmered dishes.")}
+ if(d=="Halal"){A("Mirin and cooking sake, which contain alcohol, are used in many sauces.");A("Ramen broth and gyoza often contain pork. Halal status is hard to see on a menu, so ask.")}
+ if(d=="Diabetic"||x.indexOf("Low sugar")>-1){A("Teriyaki and other sweet sauces can contain a lot of sugar.");A("Rice portions are often large. You can ask for a smaller one.")}
+ if(d=="No beef"){A("Beef bowls (gyudon) and sukiyaki are common.");A("Curry roux and some broths can contain beef.")}
+ if(d=="Vegan")A("Egg and dairy appear in mayonnaise, tempura batter and some breads and sweets.");
+ if(x.indexOf("No egg")>-1)A("Egg appears in tamagoyaki, tempura batter and some ramen toppings.");
+ if(hasNote())A("Tell staff about your allergy before you order. Menus don't always list ingredients.");
+ return w}
+function watchHTML(){var w=watchFor();return '<h3>What to watch for in Japanese food</h3>'+(w.length?'<ul class="watch">'+w.map(function(t){return '<li>'+esc(t)+'</li>'}).join("")+'</ul>':'<p class="mute">Nothing special to watch for with your current preferences. If you have an allergy, tick Other and add a note.</p>')+'<p class="mute">General guidance only, not a guarantee. Please confirm with the restaurant.</p>'}
+function fishNote(){return ["Jain","Veg","Vegan"].indexOf(S.diet)>-1?'<p class="fish"><b>No fish oil.</b> Your '+esc(S.diet)+' meal is to be prepared without fish oil.</p>':""}
+var STAMPS=[],NEWST=0;
+function passportHTML(){if(S.stage==0)return"";var L=STAMPS.slice(-6),h="",k,t,r,z=S.diet.toUpperCase().replace(/ /g,"<");
+ for(k=0;k<6;k++){t=L[k];if(t){r=(t.alt?6:-8)+((k%3)-1)*5;h+='<div class="slot on"><div class="hanko'+(t.alt?' sq':'')+(t.id==NEWST?' new':'')+'" style="--rot:'+r+'deg" role="img" aria-label="'+(t.alt?'Premium alternative stamp':'Fulfilled stamp')+'">'+(t.alt?'代':'済')+'</div><small>'+esc(t.meal)+'</small><small>'+esc(t.stage)+'</small></div>'}else h+='<div class="slot" aria-hidden="true"><i>'+(k+1)+'</i></div>'}
+ return '<div class="ppt"><div class="pph"><i class="seal" aria-hidden="true">食</i><div class="pt"><b>Meal Passport</b><span class="kj">ミールパスポート</span></div><span class="cnt"><small>Stamps</small>'+L.length+' / 6</span></div>'
+ +'<div class="pdata"><div><small>Meal</small><b>'+esc(S.diet)+'</b></div><div><small>Seat</small><b>24A</b></div><div><small>Route</small><b>DEL to HND</b></div></div>'
+ +'<div class="ppg">'+h+'</div><p class="ppnote">A stamp is added to your passport each time a meal is served.</p>'
+ +'<div class="mrz" aria-hidden="true">'+esc("P<MEAL<<"+z+"<<<<<<<<<<<<")+'<br>'+esc("24A<DELHND<<<<<<<<<<<<<<<")+'</div></div>'}
+var CAP=[["旅の準備","Tabi no junbi","Preparing for the journey"],["空港","Kūkō","At the airport"],["搭乗","Tōjō","Boarding now"],["機内食","Kinaishoku","Your in-flight meal"],["ようこそ日本へ","Yōkoso Nihon e","Arrived in Japan"]];
+var FORT=[["大吉","Dai-kichi","Great blessing","Your meal will arrive hot and right on time."],["中吉","Chū-kichi","Middle blessing","A delicious surprise is waiting on the next plate."],["小吉","Shō-kichi","Small blessing","Good things come to those who read the menu twice."],["吉","Kichi","Blessing","Someone nearby will recommend the perfect dish."],["末吉","Sue-kichi","Future blessing","A slow start, a wonderful ending. Save room for dessert."]];
+function omiHTML(){if(S.omi==null)return '<div class="omi"><div><h3>Draw your omikuji <span class="kj" lang="ja">おみくじ</span></h3><p class="mute">At Japanese shrines, people draw a paper fortune. Draw one for your trip.</p><button class="btn" id="omi">Draw my fortune</button></div></div>';
+ var f=FORT[S.omi];return '<div class="omi"><div class="k" lang="ja">'+f[0]+'</div><div><h3>'+f[1]+' <span class="mute">'+f[2]+'</span></h3><p>'+f[3]+'</p><p><span class="sw" style="background:var(--f-'+S.diet.toLowerCase().replace(" ","-")+')"></span>Lucky meal: '+esc(S.diet)+'. Lucky seat: 24A.</p></div></div>'}
+var BEN={Jain:["Beans or lentils, no onion or garlic","Above-ground vegetables"],Veg:["Tofu or vegetable dish","Seasonal vegetables"],Vegan:["Tofu and vegetables","Seasonal vegetables"],Halal:["Halal chicken or fish","Seasonal vegetables"],Diabetic:["Grilled fish or chicken","Extra vegetables"],"No beef":["Chicken or fish","Seasonal vegetables"],Regular:["Chef\u2019s main dish","Seasonal side"]};
+function bentoHTML(){var d=S.diet,b=BEN[d]||BEN.Regular,sm=d=="Diabetic",sc=sm?.72:1,dl=function(n){return'style="animation-delay:'+n+'s"'},
+ items=[["主食","Shushoku",sm?"Smaller rice portion":"Rice"],["主菜","Shusai",b[0]],["副菜","Fukusai",b[1]],["果物","Kudamono",sm?"Low-sugar fruit":"Fresh fruit"]];
+ return '<div class="bento"><h3>Your meal tray <span class="kj" lang="ja">お弁当</span></h3><svg viewBox="0 0 320 150" role="img" aria-label="Illustration of your meal tray with four compartments" style="--mc:var(--f-'+d.toLowerCase().replace(" ","-")+')">'
+ +'<rect class="bx" x="4" y="4" width="312" height="142" rx="14"/><rect x="9" y="9" width="302" height="132" rx="10" fill="none" stroke="#b5122a" stroke-width="1.5"/>'
+ +'<rect class="bc" x="14" y="14" width="110" height="122" rx="8"/><rect class="bc" x="132" y="14" width="174" height="70" rx="8"/><rect class="bc" x="132" y="92" width="84" height="44" rx="8"/><rect class="bc" x="222" y="92" width="84" height="44" rx="8"/>'
+ +'<g class="bi" '+dl(.05)+'><g transform="translate(69 80) scale('+sc+')"><path d="M-40 30C-44 -10 -20 -36 0 -36C20 -36 44 -10 40 30Z" fill="#fff" stroke="#23211f" stroke-width="2"/><g fill="#23211f"><ellipse cx="-16" cy="2" rx="2" ry="1.2"/><ellipse cx="12" cy="-12" rx="2" ry="1.2"/><ellipse cx="2" cy="16" rx="2" ry="1.2"/><ellipse cx="20" cy="10" rx="2" ry="1.2"/><ellipse cx="-8" cy="-18" rx="2" ry="1.2"/></g><circle cy="-2" r="5" fill="#b5122a"/></g></g>'
+ +'<g class="bi" '+dl(.2)+'><ellipse class="bm" cx="168" cy="54" rx="22" ry="15"/><ellipse class="bm" cx="210" cy="44" rx="22" ry="15"/><ellipse class="bm" cx="252" cy="56" rx="22" ry="15"/><circle class="bg" cx="286" cy="32" r="9"/></g>'
+ +'<g class="bi" '+dl(.35)+'><circle class="bg" cx="156" cy="118" r="10"/><circle class="bg" cx="176" cy="111" r="11"/><circle class="bg" cx="196" cy="119" r="9"/></g>'
+ +'<g class="bi" '+dl(.5)+'><circle class="bo" cx="264" cy="114" r="17"/><path d="M264 98v32M248 114h32M253 103l22 22M275 103l-22 22" stroke="#fff" stroke-width="1.5" opacity=".75"/></g></svg>'
+ +'<dl class="bl">'+items.map(function(i){return'<div><b lang="ja">'+i[0]+'</b><i>'+i[1]+'</i><span>'+i[2]+'</span></div>'}).join("")+'</dl><p class="n">Illustration only. The airline decides exactly what goes into each meal.</p></div>'}
+var JD={Jain:["Dashi (fish stock), egg, onion, garlic and root vegetables are common in sauces and broths.",[["精進料理","Shōjin ryōri","Buddhist temple cuisine, built on seasonal plants, tofu and sesame. It traditionally avoids onion and garlic.","Ask for no root vegetables, and no dashi."],["湯豆腐","Yudōfu","Tofu gently simmered in kombu (seaweed) broth, a Kyoto classic.","Skip the ginger and spring onion toppings."],["冷奴","Hiyayakko","Chilled tofu, light and simple.","Ask for it plain: toppings often include bonito flakes, ginger and spring onion."],["梅おにぎり","Ume onigiri","A rice ball with pickled plum, wrapped in nori, sold in every convenience store.","Read the label for fish-based seasoning."]]],
+Veg:["Katsuo dashi (bonito stock) is in many soups, sauces and simmered dishes, and pork broth is common in ramen.",[["精進料理","Shōjin ryōri","Temple cuisine: a full multi-course meal with no meat or fish.","Confirm that no fish stock is used."],["湯葉","Yuba","Delicate tofu skin, a speciality of Kyoto and Nikko.","Often served with soy sauce or salt."],["野菜天ぷら","Yasai tempura","Vegetables in a light, crisp batter.","Ask for salt (塩) or matcha salt instead of the dipping sauce, which usually has dashi."],["いなり寿司","Inari-zushi","Sushi rice in a sweet fried tofu pouch, easy to find at stations and supermarkets.","Check the label for fish-based seasoning."]]],
+Vegan:["Dashi (fish stock), egg, milk, butter and honey are common hidden ingredients, even in dishes that look plant-based.",[["精進料理","Shōjin ryōri","Plant-based temple cuisine with tofu, sesame, seasonal vegetables and pickles.","Confirm no dashi, dairy or honey."],["湯豆腐","Yudōfu","Tofu in a kombu broth, warming and simple.","Skip the bonito-flake toppings."],["かっぱ巻き","Kappa-maki","A cucumber sushi roll. Pickled-radish (お新香巻き) and gourd (かんぴょう巻き) rolls are other options.","Confirm there is no egg or fish flakes in the rice."],["ヴィーガンラーメン","Vegan ramen","A growing number of ramen shops in Tokyo, Kyoto and Osaka now serve vegetable-based bowls.","Look for ヴィーガン on the menu, or search on a vegan-restaurant app."]]],
+Halal:["Mirin and sake (alcohol) are widely used in sauces and glazes, and tonkotsu (pork) broth and lard are common in ramen.",[["寿司・刺身","Sushi and sashimi","Raw fish on rice, or on its own. Seafood is the simplest halal-friendly choice.","Ask about sauces and glazes. Soy sauce is usually fine."],["焼き魚定食","Yakizakana teishoku","A set meal of salt-grilled fish, rice and miso soup.","Ask whether mirin or sake is used."],["天ぷら","Seafood tempura","Seafood and vegetables in light batter.","Ask for salt, since the dipping sauce contains mirin."],["ハラール認証レストラン","Halal-certified restaurants","Tokyo, Osaka and Kyoto have certified ramen, wagyu and curry restaurants.","Look for a halal certificate or use a halal directory such as Halal Gourmet Japan."]]],
+Diabetic:["Sugar hides in sweet sauces such as teriyaki, tare and sukiyaki, and in wagashi (traditional sweets). White rice portions can be large.",[["焼き魚定食","Yakizakana teishoku","Grilled fish with rice, miso soup, vegetables and pickles: a balanced set meal.","Ask for less rice (ごはん少なめ)."],["刺身定食","Sashimi teishoku","Fresh raw fish, rice and soup, with plenty of protein.","Go easy on sweet soy-based sauces."],["ざる蕎麦","Zaru soba","Chilled buckwheat noodles, often a lighter choice than ramen.","Use only a little of the dipping sauce."],["しゃぶしゃぶ","Shabu-shabu","Lean meat or tofu and vegetables swished in hot broth.","Choose ponzu over sesame sauce, and skip the extra rice or noodles."]]],
+"No beef":["Beef extract or tallow is common in Japanese curry roux, some ramen and udon broths, and anything labelled wagyu, gyūdon or sukiyaki.",[["焼き鳥","Yakitori","Chicken skewers grilled over charcoal, an easy and widely available choice.","Ask for salt (塩) or sauce (タレ) as you prefer."],["唐揚げ","Karaage","Crisp Japanese fried chicken, found at izakaya and convenience stores.","Confirm it is chicken, not beef."],["親子丼","Oyakodon","A rice bowl of chicken and egg simmered in dashi.","Confirm the broth has no beef."],["とんかつ","Tonkatsu","A breaded, deep-fried pork cutlet with cabbage and miso soup.","Check that any curry sauce does not contain beef."]]],
+Regular:["Japanese food changes by season and by region, so ask locals what is best right now.",[["寿司","Sushi","Fresh fish on vinegared rice, from conveyor-belt shops to counter dining.","Eat nigiri in one bite, and dip the fish side in soy sauce."],["ラーメン","Ramen","Noodles in rich broth. Styles differ by city: shoyu in Tokyo, tonkotsu in Fukuoka, miso in Sapporo.","Slurping is welcome."],["お好み焼き","Okonomiyaki","A savoury pancake with cabbage, grilled at your table in Osaka and Hiroshima.","Try both regional styles."],["懐石料理","Kaiseki","A seasonal multi-course meal, the high point of Japanese hospitality.","Book ahead and mention any dietary needs when booking."]]]};
+var JP_D=null;
+function jpRender(){var d=JP_D||S.diet,j=JD[d],c=$("jpr");
+ c.innerHTML=Object.keys(JD).map(function(k){return'<button aria-pressed="'+(k==d)+'" data-d="'+esc(k)+'">'+esc(k)+(k==S.diet?" \u2022 you":"")+'</button>'}).join("");
+ c.querySelectorAll("button").forEach(function(b){b.onclick=function(){JP_D=b.dataset.d;jpRender()}});
+ $("jpb").innerHTML='<p class="fish"><b>Watch for:</b> '+j[0]+'</p><div class="jpg" style="--mc:var(--f-'+d.toLowerCase().replace(" ","-")+',var(--ink))">'+j[1].map(function(x){return'<div class="dish"><b class="k" lang="ja">'+x[0]+'</b><i>'+x[1]+'</i><p>'+x[2]+'</p><p class="ask"><b>Tip:</b> '+x[3]+'</p></div>'}).join("")+'</div>'}
+function sceneUpd(){var c=CAP[S.stage];$("scene").style.setProperty("--s",S.stage);$("scenecap").innerHTML='<b lang="ja">'+c[0]+'</b><span>'+c[1]+'</span><span>'+c[2]+'</span>'}
+var SAY={Jain:["ジャイナ教徒です。肉、魚、卵、玉ねぎ、にんにく、根菜は食べられません。","Jainakyōto desu. Niku, sakana, tamago, tamanegi, ninniku, konsai wa taberaremasen."],Veg:["ベジタリアンです。肉と魚は食べません。かつおだしは入っていますか？","Bejitarian desu. Niku to sakana wa tabemasen. Katsuo dashi wa haitte imasu ka?"],Vegan:["ヴィーガンです。肉、魚、卵、乳製品、はちみつは食べません。","Vīgan desu. Niku, sakana, tamago, nyūseihin, hachimitsu wa tabemasen."],Halal:["ハラールです。豚肉とお酒（みりんを含む）は食べません。","Hararu desu. Butaniku to osake (mirin mo fukumu) wa tabemasen."],Diabetic:["糖尿病です。砂糖は控えめにお願いします。","Tōnyōbyō desu. Satō wa hikaeme ni onegai shimasu."],"No beef":["牛肉は食べません。","Gyūniku wa tabemasen."],Regular:["おすすめは何ですか？","Osusume wa nan desu ka?"]};
+var SAYX={"No onion, garlic or root veg":["玉ねぎ、にんにく、根菜は使わないでください。","Tamanegi, ninniku, konsai wa tsukawanaide kudasai."],"Low sugar":["砂糖は控えめにお願いします。","Satō wa hikaeme ni onegai shimasu."],"No egg":["卵は食べられません。","Tamago wa taberaremasen."]};SAYX[OTHER]=["アレルギーがあります。","Arerugī ga arimasu."];
+function sayHTML(){var L=[["すみません、食べ物のことでお願いがあります。","Sumimasen, tabemono no koto de onegai ga arimasu."],SAY[S.diet]],seen={},i,p;
+ S.extra.forEach(function(x){if(SAYX[x])L.push(SAYX[x])});L.push(["ありがとうございます。","Arigatō gozaimasu."]);
+ return '<div class="say"><div class="noren" aria-hidden="true"><i></i><i>食</i><i>事</i><i></i></div><h3>Show this to restaurant staff <span class="kj" lang="ja">お店の方へ</span></h3><p class="mute">Hold up your phone so staff can read the Japanese. These are simple starter phrases. For a serious allergy, also ask staff to confirm.</p><ul>'
+ +L.filter(function(p){if(seen[p[0]])return false;seen[p[0]]=1;return true}).map(function(p){return '<li><b lang="ja">'+p[0]+'</b><span>'+p[1]+'</span></li>'}).join("")+'</ul>'
+ +'<h3>Table manners in Japan</h3><ul class="manner"><li>Say itadakimasu before you eat and gochisōsama deshita when you finish.</li><li>Never stand chopsticks upright in rice, and don\u2019t pass food from chopsticks to chopsticks.</li><li>Tipping is not expected. Slurping noodles is fine.</li></ul></div>'}
+function itada(){var d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.innerHTML='<b lang="ja">いただきます</b><span>Enjoy your meal</span>';document.body.appendChild(d);setTimeout(function(){d.remove()},3200)}
+(function(){var b=document.createElement("div"),i,s;b.className="sakura";b.setAttribute("aria-hidden","true");for(i=0;i<9;i++){s=document.createElement("i");s.style.cssText="left:"+(4+i*11)+"%;width:"+(8+i%3*3)+"px;height:"+(8+i%3*3)+"px;animation-duration:"+(12+i*7%8)+"s;animation-delay:-"+(i*2.3)+"s;--d:"+(i%2?45:-45)+"px";b.appendChild(s)}document.body.appendChild(b)})();
+function sk(){return S.diet+"|"+S.extra.join(",")+"|"+S.note}
+function cutAt(){var m=DEP_H*60+DEP_M-CUT;return two(Math.floor(m/60))+":"+two(m%60)}
+function render(){
+ var f=document.activeElement,fk=f&&f.dataset&&f.dataset.v&&f.closest("#screen")?f.className.split(" ")[1]+"|"+f.dataset.v:"";
+ mkSteps();$("stagebadge").textContent=NAMES[S.stage];var h="",CH=["Jain","Veg","Vegan","Halal","Diabetic","No beef","Regular"];
+ if(S.stage==0){h='<h2>Set your meal preferences</h2><p class="mute">Choose once. It applies to every flight you book, and we\u2019ll use it to prepare for your journey. Meal changes close at '+cutAt()+' on departure day.</p>'+chips(CH,S.diet,"d")+'<h3>Anything else we should know?</h3><p class="mute">Select all that apply.</p>'+chips(EXTRAS,S.extra,"x")+noteBox()+passCard()+'<button class="btn" id="go1">Save my meal preferences</button><p class="ok" id="saved" role="status">'+(S.sk==sk()?'Your meal preferences are saved. Your '+esc(S.diet)+' meal is on your booking.':'')+'</p>'}
+ else if(S.stage==1){h='<h2>Plans changed?</h2><p class="mute">You can request a different meal until catering closes at '+cutAt()+'.</p>'+passCard()+'<p><span class="cut" id="cutleft"></span></p><h3>Change my meal to</h3>'+chips(CH,S.pick,"c")+reqBtn("Request a meal change")+'<p class="mute rnote">Your request goes to the crew for approval. We\u2019ll show its status below when it changes.</p>'}
+ else if(S.stage==2){h='<h2>Boarding</h2><p class="mute">Catering has closed. If the crew approves, a hot meal comes from the on-board buffer.</p>'+passCard()+'<p><span class="badge b-warn">Catering closed</span></p><h3>Change my meal to</h3>'+chips(["Jain","Veg","Vegan","Halal","Diabetic"],S.pick,"c")+reqBtn("Request a meal change")}
+ else if(S.stage==3){h='<h2>In-flight</h2><p class="mute">Need a different meal now? Ask the crew here. If the buffer has none left, they may offer a premium alternative.</p>'+passCard()+'<h3>Change my meal to</h3>'+chips(["Jain","Veg","Vegan","Halal","Diabetic","No beef"],S.pick,"c")+reqBtn("Ask the crew")}
+ else{h='<h2>Welcome to Japan</h2><p class="mute">Eating out is easier when you know what to look for. Read the notes below. Your preferences stay saved for your next flight.</p>'+passCard()+watchHTML()+sayHTML()}
+ if(S.stage>0&&S.stage<4)h+=profEdit();
+ $("screen").innerHTML=h;$("passport").innerHTML=passportHTML()+bentoHTML()+(S.stage==4?omiHTML():"");sceneUpd();
+ if(S.enter){S.enter=0;$("screen").classList.remove("in");void $("screen").offsetWidth;$("screen").classList.add("in")}
+ if($("prof"))$("prof").ontoggle=function(){S.profOpen=this.open};
+ document.querySelectorAll(".d").forEach(function(b){b.onclick=function(){S.diet=b.dataset.v;S.pick=S.diet;render()}});
+ document.querySelectorAll(".x").forEach(function(b){b.onclick=function(){toggleExtra(b.dataset.v);render()}});
+ document.querySelectorAll(".c").forEach(function(b){b.onclick=function(){S.pick=b.dataset.v;render()}});
+ if($("go1"))$("go1").onclick=function(){if(S.extra.indexOf(OTHER)>-1&&!S.note.trim()){$("saved").className="err";$("saved").textContent="Add a few words about your allergy or note, or untick Other.";$("note").focus();return}
+  $("saved").className="ok";S.sk=sk();drawCrew();S.log.push("Profile saved: "+S.diet);$("saved").textContent="Your meal preferences are saved. Your "+S.diet+" meal is on your booking.";if(!S.req)$("mystatus").innerHTML='<span class="badge b-ok">Saved</span> '+esc(S.diet)+' meal is on your booking.'};
+ if($("note"))$("note").oninput=function(){S.note=this.value;var pm=document.querySelector(".pass .pm span");if(pm)pm.textContent=extraText();if($("saved")&&S.sk!=sk())$("saved").textContent="";drawCrew()};
+ if($("req"))$("req").onclick=request;if($("omi"))$("omi").onclick=function(){S.omi=Math.floor(Math.random()*FORT.length);render()};
+ if(fk){var p=fk.split("|"),el=document.querySelector('#screen .'+p[0]+'[data-v="'+p[1]+'"]');if(el)el.focus({preventScroll:true})}
+}
+function ord(a,b){return (isOpen(b)?1:0)-(isOpen(a)?1:0)||b.id-a.id}
+var RID=0;
+function reqs(){return S.log.filter(function(x){return typeof x=="object"})}
+function isOpen(r){return r.status=="Pending"||r.status=="Approved"}
+function openReq(){return reqs().some(isOpen)}
+function stockOf(m){return Object.prototype.hasOwnProperty.call(BUF,m)?BUF[m]:0}
+function findReq(id){return reqs().filter(function(x){return x.id==id})[0]}
+function reqBtn(label){var o=openReq();return '<button class="btn" id="req"'+(o?' disabled':'')+'>'+label+'</button>'+(o?'<p class="mute rnote">You already have an open request. Wait for the crew to decide.</p>':'')}
+function info(r){var m=r.meal,buf=r.kind=="buffer",none=buf&&isOpen(r)&&stockOf(m)<1,o={};
+ if(r.status=="Pending"){o.tag="Pending";o.cls="b-warn";
+  o.act=(buf?"Hand over 1 "+m+" meal from buffer":"Add "+m+" meal to catering uplift")+". Waiting for crew approval.";
+  o.out="Request sent. Waiting for crew approval."}
+ else if(r.status=="Approved"){o.tag="Approved";o.cls="b-info";
+  o.act="Approved by crew. "+(buf?"1 "+m+" meal to be handed over from buffer":m+" meal to be added to catering uplift")+", not served yet.";
+  o.out="Approved by crew. Your meal has not been served yet."}
+ else if(r.status=="Rejected"){o.tag="Rejected";o.cls="b-red";
+  o.act="Rejected by crew. No change made"+(buf?", no buffer stock used":"")+".";
+  o.out="Rejected by crew. No change was made. Please ask the crew for options."}
+ else if(r.alt){o.tag="Fulfilled (premium alternative)";o.cls="b-alt";
+  o.act="Premium alternative served instead of "+m+" (no buffer stock). No buffer stock used.";
+  o.out="Fulfilled with a premium alternative, because no "+m+" meal was left in the buffer."}
+ else{o.tag="Fulfilled";o.cls="b-ok";
+  o.act=buf?"1 "+m+" meal served from buffer.":m+" meal loaded from catering.";
+  o.out=buf?"Fulfilled. Hot "+m+" meal served from buffer.":"Fulfilled. Fresh "+m+" meal loaded."}
+ if(none){o.act+=" Buffer stock is 0: needs a premium alternative, or it cannot be fulfilled.";
+  o.out+=" No "+m+" meal is left in the buffer right now, so the crew may offer a premium alternative."}
+ return o}
+function request(){var st=S.stage;
+ if(st<1||st>3||openReq()){sync();return}
+ var r={id:++RID,seat:"24A",name:"You (demo)",stage:NAMES[st],meal:S.pick,kind:st==1?"catering":"buffer",status:"Pending",alt:false};
+ S.req=r;S.log.push(r);sync()}
+function act(id,a){var r=findReq(id);if(!r)return;
+ if(r.status=="Pending"){
+  if(a=="approve")r.status="Approved";
+  else if(a=="reject")r.status="Rejected"}
+ else if(r.status=="Approved"){
+  var n=r.kind=="buffer"?stockOf(r.meal):1;
+  if(a=="fulfil"&&n>0){if(r.kind=="buffer")BUF[r.meal]=Math.max(0,BUF[r.meal]-1);r.status="Fulfilled"}
+  else if(a=="alt"&&r.kind=="buffer"&&n<1){r.alt=true;r.status="Fulfilled"}
+  else if(a=="reject"&&r.kind=="buffer"&&n<1)r.status="Rejected"}
+ if(r.status=="Fulfilled"&&!STAMPS.some(function(t){return t.id==r.id})){STAMPS.push({id:r.id,meal:r.meal,stage:r.stage,alt:!!r.alt});NEWST=r.id;itada()}
+ sync()}
+function adjBuf(k,d){if(!Object.prototype.hasOwnProperty.call(BUF,k))return;BUF[k]=Math.max(0,BUF[k]+d);sync()}
+function sync(){render();drawStatus();drawGround();drawCrew();NEWST=0}
+function drawStatus(){var r=S.req;if(!r)return;var i=info(r);
+ $("mystatus").innerHTML='<span class="badge '+i.cls+'">'+esc(i.tag)+'</span> '+esc(i.out)+'<span class="mute" style="display:block;margin-top:4px">Sent during: '+esc(r.stage)+'</span>'}
+function drawGround(){if(!S.req){return}$("galerts").innerHTML=reqs().sort(ord).map(function(x){var i=info(x);return '<div class="alert'+(isOpen(x)?' open':'')+'"><b>Seat '+esc(x.seat)+'</b><span class="mtag">'+esc(x.meal)+'</span> <span class="badge '+i.cls+'">'+esc(i.tag)+'</span><br>'+esc(i.act)+'<br><span class="mute">Raised at: '+esc(x.stage)+'</span></div>'}).join("")}
+var CONF=0;
+function btns(r){var n=r.kind=="buffer"?stockOf(r.meal):1,b="";
+ function B(a,t,alt){return '<button class="abtn'+(alt?' alt':'')+'" data-a="'+a+'" data-id="'+r.id+'">'+t+'</button>'}
+ if(CONF==r.id)return '<div class="chips conf"><span>Reject this request?</span>'+B("reject","Yes, reject")+B("keep","Keep request",1)+'</div>';
+ if(r.status=="Pending")b=B("approve","Approve")+B("ask","Reject",1);
+ else if(r.status=="Approved")b=n>0?B("fulfil","Mark as fulfilled"):B("alt","Serve premium alternative")+B("ask","Reject",1);
+ return b?'<div class="chips" style="margin-top:10px">'+b+'</div>':""}
+function drawCrew(){var rows=CREW.map(function(r){return r.concat("b-ok")});var q=S.req;var rs=reqs();
+ var me=q?[["24A","You (demo)",q.meal,info(q).tag,info(q).cls]]:[["24A","You (demo)",S.diet,"Confirmed","b-ok"]];rows=rows.concat(me).sort(function(a,b){return parseInt(a[0])-parseInt(b[0])});
+ $("crewrows").innerHTML=rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+(r[0]=="24A"&&hasNote()?'<br><span class="mute">Note: '+esc(S.note.trim())+'</span>':'')+'</td><td><span class="badge '+r[4]+'">'+esc(r[3])+'</span></td></tr>'}).join("");
+ $("calerts").innerHTML=rs.length?'<h3>Meal change requests</h3>'+rs.slice().sort(ord).map(function(x){var i=info(x);return '<div class="alert'+(isOpen(x)?' open':'')+'"><b>Seat '+esc(x.seat)+'</b><span class="mtag">'+esc(x.meal)+'</span> <span class="badge '+i.cls+'">'+esc(i.tag)+'</span><br>'+esc(i.act)+(x.kind=="buffer"&&isOpen(x)?'<br><span class="mute">Buffer stock for '+esc(x.meal)+': '+stockOf(x.meal)+'</span>':'')+'<br><span class="mute">Raised at: '+esc(x.stage)+'</span>'+btns(x)+'</div>'}).join(""):'<div class="empty">No meal change requests yet. Requests from passengers will appear here, with the option to approve or reject.</div>';
+ $("buf").innerHTML=Object.keys(BUF).map(function(k){return '<div class="stock"><b>'+esc(k)+'</b><span class="stk"><button class="sb" data-k="'+esc(k)+'" data-d="-1" aria-label="Decrease '+esc(k)+' stock"'+(BUF[k]<1?' disabled':'')+'>\u2212</button><span><b class="q">'+BUF[k]+'</b> <span class="mute">left</span></span><button class="sb" data-k="'+esc(k)+'" data-d="1" aria-label="Increase '+esc(k)+' stock">+</button></span></div>'}).join("")+'<p class="mute" style="margin-top:10px">Stock only goes down when an approved buffer meal is marked as fulfilled. Use + and \u2212 to correct the count.</p>'}
+function drawFc(){var n=+$("pax_n").value,c=+$("chg").value/100;$("v1").textContent=n;$("v2").textContent=Math.round(c*100);var tl=0,tb=0;
+ $("fcrows").innerHTML=DIETS.map(function(d){var e=Math.round(n*d[1]),sd=Math.sqrt(n*d[1]*(1-d[1])),b=d[0]=="Regular"?Math.ceil(e*c*.5):Math.ceil(1.645*sd*0.5+e*c);tl+=e+b;tb+=b;return '<tr><td>'+d[0]+'</td><td>'+Math.round(d[1]*100)+'%</td><td>'+e+'</td><td>'+b+'</td><td><b>'+(e+b)+'</b></td></tr>'}).join("");
+ $("kpi").innerHTML='<div><b>'+tl+'</b><span>Total meals to load</span></div><div><b>'+tb+'</b><span>Buffer meals</span></div><div><b>'+Math.max(0,tl-n)+'</b><span>Extra vs one per seat</span></div>'}
+var UNLOCKED=false,FAILS=0,LOCKUNTIL=0,CODE_HASH="03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+var SECS=["pax","ground","crew","fc","jp","guide"];
+function showTab(id){document.querySelectorAll(".tab").forEach(function(x){x.setAttribute("aria-selected",x.dataset.t==id)});SECS.forEach(function(k){$(k).classList.toggle("hide",k!=id)});$("lock").classList.add("hide");if(id=="jp")jpRender()}
+document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){showTab(t.dataset.t)}});
+function setMode(m){var locked=m=="crew"&&!UNLOCKED;
+ if(m=="pax")UNLOCKED=false;
+ $("m-pax").setAttribute("aria-pressed",m=="pax");$("m-crew").setAttribute("aria-pressed",m=="crew");
+ $("m-crew").textContent=UNLOCKED?"Crew view":"Crew sign in";
+ document.querySelectorAll(".tab").forEach(function(t){t.classList.toggle("hide",locked||t.dataset.r!=m&&t.dataset.r!="all")});$("nav").classList.toggle("hide",locked);
+ if(locked){SECS.forEach(function(k){$(k).classList.add("hide")});$("lock").classList.remove("hide");$("code").value="";$("err").textContent="";$("code").focus()}
+ else showTab(m=="pax"?"pax":"ground")}
+function sha(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(d){return Array.prototype.map.call(new Uint8Array(d),function(x){return("0"+x.toString(16)).slice(-2)}).join("")})}
+function tryCode(){var now=Date.now();
+ if(now<LOCKUNTIL){$("err").textContent="Too many attempts. Try again in "+Math.ceil((LOCKUNTIL-now)/1000)+" s.";return}
+ if(!(window.crypto&&crypto.subtle)){$("err").textContent="Code check is not available in this browser.";return}
+ sha($("code").value.trim().toUpperCase()).then(function(h){
+  if(h===CODE_HASH){FAILS=0;UNLOCKED=true;setMode("crew")}
+  else{FAILS++;$("code").value="";if(FAILS>=3){LOCKUNTIL=Date.now()+30000;FAILS=0;$("err").textContent="Too many attempts. Locked for 30 s."}else $("err").textContent="Incorrect code."}})}
+$("m-pax").onclick=function(){setMode("pax")};$("m-crew").onclick=function(){setMode("crew")};
+$("unlock").onclick=tryCode;$("cancel").onclick=function(){setMode("pax")};$("code").onkeydown=function(e){if(e.key=="Enter")tryCode()};
+$("calerts").onclick=function(e){var b=e.target.closest?e.target.closest(".abtn"):null;if(!b)return;var a=b.dataset.a,id=+b.dataset.id;
+ if(a=="ask"||a=="keep"){CONF=a=="ask"?id:0;drawCrew();var n=document.querySelector('#calerts .abtn[data-id="'+id+'"]');if(n)n.focus();return}
+ CONF=0;act(id,a)};
+$("buf").onclick=function(e){var b=e.target.closest?e.target.closest(".sb"):null;if(!b||b.disabled)return;var k=b.dataset.k,d=+b.dataset.d;adjBuf(k,d);
+ var s=document.querySelector('.sb[data-k="'+k+'"][data-d="'+d+'"]');if(s&&s.disabled)s=document.querySelector('.sb[data-k="'+k+'"][data-d="1"]');if(s)s.focus()};
+$("pax_n").oninput=drawFc;$("chg").oninput=drawFc;
+render();drawCrew();drawFc();setMode("pax");tick();setInterval(tick,15000);
+var LANG="en",ORIG=new WeakMap();
+var MN={Jain:"ジャイナ食",Veg:"ベジタリアン",Vegan:"ヴィーガン",Halal:"ハラール",Diabetic:"糖尿病食","No beef":"牛肉なし",Regular:"通常食"};
+var ST={Before:"出発前","Before journey":"出発前",Airport:"空港",Boarding:"搭乗","In-flight":"機内",Landed:"到着"};
+function tm(m){return MN[m]||m}function ts(m){return ST[m]||m}
+var TR={"Your meal, on every stage of the journey":"旅のすべての場面で、あなたの食事を","Passenger view":"乗客用","Crew sign in":"乗務員ログイン","Crew view":"乗務員用","Passenger app":"乗客アプリ","Ground & catering":"地上・ケータリング","Crew dashboard":"乗務員ダッシュボード","Demand forecast":"需要予測","Meal guide":"食事ガイド","Language":"言語","Choose view":"表示を選択",
+"Crew access":"乗務員アクセス","Enter the crew code to open the ground, crew and forecast screens.":"地上、乗務員、予測の画面を開くには乗務員コードを入力してください。","Crew code":"乗務員コード","Unlock crew view":"乗務員画面を開く","Back to passenger view":"乗客用に戻る","Incorrect code.":"コードが正しくありません。","Too many attempts. Locked for 30 s.":"試行回数が多すぎます。30秒間ロックされます。","Code check is not available in this browser.":"このブラウザではコード確認を利用できません。",
+"Sample flight, seat 24A":"サンプル便、座席24A","Sample flight":"サンプル便","Journey stage, set by the flight clock":"飛行時刻に基づく旅の段階","Your meal request":"ご希望の食事リクエスト","No meal change requested yet. You can ask for one at the airport, at boarding or in flight.":"食事の変更リクエストはまだありません。空港、搭乗時、または機内でご依頼いただけます。",
+"Demo controls":"デモ操作","For presenting the prototype only. Passengers never see this panel. The app normally reads the time itself and picks the stage.":"プロトタイプの紹介用です。乗客にはこのパネルは表示されません。通常はアプリが時刻を読み取り、段階を自動で選びます。","Sample flight departs 22:30, flies 8 h, and catering closes 90 min before departure.":"サンプル便は22:30発、飛行時間は8時間で、ケータリングは出発の90分前に締め切られます。","Live time":"現在時刻","Simulate time":"時刻をシミュレート","Time to departure:":"出発までの時間:","Before journey":"出発前","Airport":"空港","Boarding":"搭乗","In-flight":"機内","Landed":"到着","Before":"出発前",
+"How it works":"仕組み","Set your meal preferences once. Last-minute changes reach catering and crew. The app shows only the stage that matches the time to departure.":"食事の希望は一度設定するだけ。直前の変更はケータリングと乗務員に届きます。アプリは出発までの時間に合った段階だけを表示します。","Stage":"段階","What the passenger does":"乗客の行動","What the airline gets":"航空会社が得るもの","Sets preferences once":"希望を一度設定","Meal order and early demand signal":"食事の注文と早期の需要の目安","Changes meal at lounge or gate":"ラウンジまたはゲートで食事を変更","Catering alert before the cut-off":"締切前にケータリングへ通知","Confirms or changes":"確認または変更","Gate staff see the open request":"ゲートの係員が未処理のリクエストを確認","Asks the crew or app":"乗務員またはアプリに依頼","Hot meal from buffer, or premium alternative":"予備から温かい食事、または上位の代替食",
+"Catering and ground staff":"ケータリング・地上スタッフ","Requests that need attention are listed first, with the action to take.":"対応が必要なリクエストを先頭に、必要な対応とともに表示します。","Catering note:":"ケータリング注記:","Veg, Vegan and Jain meals must be prepared without fish oil.":"ベジタリアン、ヴィーガン、ジャイナ食は魚油を使わずに調理してください。","No requests yet. Make a change in the Passenger app and it will appear here.":"リクエストはまだありません。乗客アプリで変更すると、ここに表示されます。",
+"Cabin crew":"客室乗務員","Meal list":"食事リスト","Reminder:":"確認:","Veg, Vegan and Jain meals contain no fish oil.":"ベジタリアン、ヴィーガン、ジャイナ食には魚油は含まれません。","Seat":"座席","Passenger":"乗客","Meal":"食事","Status":"状況","Buffer stock on board":"機内の予備在庫","You (demo)":"あなた（デモ）","Meal change requests":"食事変更リクエスト","No meal change requests yet. Requests from passengers will appear here, with the option to approve or reject.":"食事変更リクエストはまだありません。乗客からのリクエストがここに表示され、承認または却下できます。","Approve":"承認","Reject":"却下","Mark as fulfilled":"提供済みにする","Serve premium alternative":"上位の代替食を提供","Reject this request?":"このリクエストを却下しますか？","Yes, reject":"はい、却下します","Keep request":"リクエストを残す","left":"残り","Stock only goes down when an approved buffer meal is marked as fulfilled. Use + and \u2212 to correct the count.":"在庫は、承認された予備の食事を提供済みにしたときだけ減ります。数が合わない場合は + と \u2212 で修正してください。",
+"Pending":"保留中","Approved":"承認済み","Rejected":"却下","Fulfilled":"提供済み","Fulfilled (premium alternative)":"提供済み（上位の代替食）","Confirmed":"確認済み","Saved":"保存済み","Stamps":"スタンプ","Route":"区間","A stamp is added to your passport each time a meal is served.":"食事が提供されるたびに、パスポートにスタンプが押されます。","Your Meal Passport stamps":"ミールパスポートのスタンプ","Your stamps will appear here when a meal is served.":"食事が提供されると、ここにスタンプが押されます。","Premium alternative":"上位の代替食","Fulfilled stamp":"提供済みのスタンプ","Premium alternative stamp":"上位の代替食のスタンプ",
+"Meals to load":"積み込む食事","Expected demand plus a safety buffer for last-minute changes. Move the sliders to see the totals update. Shares are sample assumptions, to be replaced with survey data.":"予想需要に、直前の変更に備えた安全予備を加えたものです。スライダーを動かすと合計が更新されます。割合はサンプルの仮定で、調査データに置き換える予定です。","Passengers on flight:":"搭乗者数:","Expected last-minute changes:":"直前の変更の見込み:","Meal type":"食事の種類","Share":"割合","Expected":"予想","Buffer":"予備","Load":"積載","Total meals to load":"積み込む食事の合計","Buffer meals":"予備の食事","Extra vs one per seat":"1席1食との差",
+"What each option on Meal Passport means. These are general descriptions. The airline decides exactly what goes into each meal.":"Meal Passport の各選択肢の意味です。一般的な説明であり、各食事の具体的な内容は航空会社が決めます。","No fish oil.":"魚油は使いません。","Veg, Vegan and Jain meals are to be prepared without fish oil.":"ベジタリアン、ヴィーガン、ジャイナ食は魚油を使わずに調理されます。","Meal types":"食事の種類","Extra needs":"その他のご希望","Veg (vegetarian)":"ベジタリアン（Veg）","Vegan":"ヴィーガン","Jain":"ジャイナ食","Halal":"ハラール","Diabetic":"糖尿病食","No beef":"牛肉なし","Regular":"通常食","Veg":"ベジタリアン",
+"No meat, poultry or fish, and no fish oil. Dairy is usually included. Egg practice varies by airline.":"肉、鶏肉、魚を使わず、魚油も使いません。通常は乳製品を含みます。卵の扱いは航空会社により異なります。","No animal products at all: no meat, fish, dairy, eggs or honey. No fish oil is used.":"動物性食品は一切使いません。肉、魚、乳製品、卵、はちみつを含みません。魚油も使いません。","A vegetarian meal that also leaves out onion, garlic and root vegetables such as potato and carrot. Practice varies between families, so add a note if you have more specific needs. No fish oil is used.":"玉ねぎ、にんにく、じゃがいもやにんじんなどの根菜も使わないベジタリアン食です。家庭によって実践が異なるため、より具体的なご希望があればメモを追加してください。魚油は使いません。","Food permitted under Islamic dietary law: no pork, no alcohol, and meat from animals slaughtered in the prescribed way.":"イスラム法で許された食事です。豚肉とアルコールを使わず、定められた方法で処理された動物の肉のみを使います。","A meal planned for people with diabetes, usually lower in sugar and balanced in carbohydrates. This is a meal type, not medical advice.":"糖尿病の方向けに考えられた食事で、通常は糖分を控えめにし、炭水化物のバランスを取ります。食事の種類であり、医療上の助言ではありません。","Beef is left out. Other meats may be served.":"牛肉を使いません。他の肉は提供される場合があります。","The standard meal, with no dietary restriction.":"食事制限のない標準の食事です。",
+"No onion, garlic or root veg":"玉ねぎ・にんにく・根菜なし","Low sugar":"低糖","No egg":"卵なし","Other (allergy or note)":"その他（アレルギー・メモ）","No restrictions":"制限なし","Other (details to add)":"その他（詳細を追加）","Leaves out onion, garlic and root vegetables. Already part of the Jain meal.":"玉ねぎ、にんにく、根菜を使いません。ジャイナ食にはすでに含まれています。","Reduces added sugar where the airline can.":"航空会社が可能な範囲で、加える糖分を減らします。","Leaves out egg and egg-based dishes.":"卵と卵を使った料理を使いません。","A short free-text note for anything not listed, such as an allergy. The crew can see the note. For a serious allergy, please also tell the crew in person.":"一覧にないご希望（アレルギーなど）を書く短いメモです。乗務員がメモを見ることができます。重いアレルギーの場合は、乗務員にも直接お伝えください。","Clears your extra needs.":"その他のご希望をリセットします。",
+"Set your meal preferences":"食事の希望を設定","Anything else we should know?":"ほかにお伝えしたいことはありますか？","Select all that apply.":"当てはまるものをすべて選んでください。","Save my meal preferences":"食事の希望を保存","Your meal":"あなたの食事","Tell us about your allergy or anything else":"アレルギーなど、お伝えしたいことをご記入ください","The crew can see this note. For a serious allergy, please also tell the crew in person.":"乗務員がこのメモを見ることができます。重いアレルギーの場合は、乗務員にも直接お伝えください。","Add a few words about your allergy or note, or untick Other.":"アレルギーやメモを少し書くか、「その他」のチェックを外してください。",
+"Plans changed?":"予定が変わりましたか？","Change my meal to":"食事を次に変更","Request a meal change":"食事の変更をリクエスト","Ask the crew":"乗務員に依頼","Your request goes to the crew for approval. We\u2019ll show its status below when it changes.":"リクエストは乗務員の承認のために送られます。状況が変わると、下に表示されます。","You already have an open request. Wait for the crew to decide.":"未処理のリクエストがあります。乗務員の判断をお待ちください。","Catering has closed. If the crew approves, a hot meal comes from the on-board buffer.":"ケータリングは締め切られました。乗務員が承認すれば、機内の予備から温かい食事が提供されます。","Catering closed":"ケータリング締切済み","Need a different meal now? Ask the crew here. If the buffer has none left, they may offer a premium alternative.":"今、別の食事が必要ですか？ ここから乗務員に依頼できます。予備がなければ、上位の代替食をご案内する場合があります。","Welcome to Japan":"ようこそ日本へ","Eating out is easier when you know what to look for. Read the notes below. Your preferences stay saved for your next flight.":"何に気をつければよいか分かれば、外食も安心です。下の注意点をお読みください。ご希望は次のフライトのために保存されたままです。","What to watch for in Japanese food":"日本の食事で気をつけること","General guidance only, not a guarantee. Please confirm with the restaurant.":"一般的な案内であり、保証ではありません。お店にご確認ください。","Nothing special to watch for with your current preferences. If you have an allergy, tick Other and add a note.":"現在のご希望では、特に注意する点はありません。アレルギーがある場合は「その他」を選んでメモを追加してください。","Edit my meal preferences":"食事の希望を編集",
+"Request sent. Waiting for crew approval.":"リクエストを送信しました。乗務員の承認をお待ちください。","Approved by crew. Your meal has not been served yet.":"乗務員が承認しました。食事はまだ提供されていません。","Rejected by crew. No change was made. Please ask the crew for options.":"乗務員が却下しました。変更はありません。乗務員に他の選択肢をお尋ねください。",
+"Miso soup, noodle broths and simmered dishes are often made with fish stock (dashi).":"味噌汁、麺のつゆ、煮物には、魚のだし（出汁）が使われていることがよくあります。","Bonito flakes top many dishes, including takoyaki and okonomiyaki.":"たこ焼きやお好み焼きなど、多くの料理にかつお節がのっています。","Onion and garlic are common in sauces, curry roux and gyoza fillings.":"ソース、カレールウ、餃子の具には、玉ねぎやにんにくがよく使われます。","Root vegetables such as daikon, carrot and burdock appear in many simmered dishes.":"大根、にんじん、ごぼうなどの根菜は、多くの煮物に入っています。","Mirin and cooking sake, which contain alcohol, are used in many sauces.":"アルコールを含むみりんや料理酒が、多くのソースに使われています。","Ramen broth and gyoza often contain pork. Halal status is hard to see on a menu, so ask.":"ラーメンのスープや餃子には豚肉が含まれていることが多いです。ハラールかどうかはメニューから分かりにくいため、お店に尋ねてください。","Teriyaki and other sweet sauces can contain a lot of sugar.":"照り焼きなどの甘いソースには、糖分が多く含まれることがあります。","Rice portions are often large. You can ask for a smaller one.":"ご飯の量が多いことがよくあります。少なめにお願いすることもできます。","Beef bowls (gyudon) and sukiyaki are common.":"牛丼やすき焼きはよくあるメニューです。","Curry roux and some broths can contain beef.":"カレールウや一部のだしには牛肉が含まれることがあります。","Egg and dairy appear in mayonnaise, tempura batter and some breads and sweets.":"マヨネーズ、天ぷらの衣、一部のパンやお菓子には、卵や乳製品が使われています。","Egg appears in tamagoyaki, tempura batter and some ramen toppings.":"卵焼き、天ぷらの衣、一部のラーメンのトッピングに卵が使われています。","Tell staff about your allergy before you order. Menus don't always list ingredients.":"注文の前に、アレルギーについてお店の人に伝えてください。メニューに材料がすべて載っているとは限りません。"};
+var PAT=[
+[/^T([-+])(\d+)h (\d\d)m$/,function(m){return"T"+m[1]+m[2]+"時間"+m[3]+"分"}],
+[/^Departs 22:30, (.+)$/,function(m){return"出発 22:30、"+trk(m[1])}],
+[/^Catering closes in (\d+) h (\d\d) min$/,function(m){return"ケータリング締切まであと"+m[1]+"時間"+m[2]+"分"}],
+[/^Choose once\..*close at (\d\d:\d\d) on departure day\.$/,function(m){return"選ぶのは一度だけ。予約するすべてのフライトに適用され、ご旅行の準備に使われます。食事の変更は出発当日の"+m[1]+"に締め切られます。"}],
+[/^You can request a different meal until catering closes at (\d\d:\d\d)\.$/,function(m){return"ケータリングが締め切られる"+m[1]+"まで、別の食事をリクエストできます。"}],
+[/^Your meal preferences are saved\. Your (.+) meal is on your booking\.$/,function(m){return"食事の希望を保存しました。"+tm(m[1])+"はご予約に登録されています。"}],
+[/^Your (.+) meal is to be prepared without fish oil\.$/,function(m){return tm(m[1])+"は魚油を使わずに調理されます。"}],
+[/^(.+) meal is on your booking\.$/,function(m){return tm(m[1])+"はご予約に登録されています。"}],
+[/^Hand over 1 (.+) meal from buffer\. Waiting for crew approval\.$/,function(m){return"予備から"+tm(m[1])+"を1食お渡しします。乗務員の承認待ちです。"}],
+[/^Add (.+) meal to catering uplift\. Waiting for crew approval\.$/,function(m){return"ケータリングの積み込みに"+tm(m[1])+"を追加します。乗務員の承認待ちです。"}],
+[/^Approved by crew\. 1 (.+) meal to be handed over from buffer, not served yet\.$/,function(m){return"乗務員が承認しました。予備から"+tm(m[1])+"を1食お渡しします（未提供）。"}],
+[/^Approved by crew\. (.+) meal to be added to catering uplift, not served yet\.$/,function(m){return"乗務員が承認しました。"+tm(m[1])+"をケータリングの積み込みに追加します（未提供）。"}],
+[/^Rejected by crew\. No change made(, no buffer stock used)?\.$/,function(m){return"乗務員が却下しました。変更はありません"+(m[1]?"。予備在庫は使用していません":"")+"。"}],
+[/^Premium alternative served instead of (.+) \(no buffer stock\)\. No buffer stock used\.$/,function(m){return tm(m[1])+"の代わりに上位の代替食を提供しました（予備在庫なし）。予備在庫は使用していません。"}],
+[/^1 (.+) meal served from buffer\.$/,function(m){return"予備から"+tm(m[1])+"を1食提供しました。"}],
+[/^(.+) meal loaded from catering\.$/,function(m){return"ケータリングから"+tm(m[1])+"を積み込みました。"}],
+[/^Fulfilled with a premium alternative, because no (.+) meal was left in the buffer\.$/,function(m){return"予備に"+tm(m[1])+"が残っていなかったため、上位の代替食で提供しました。"}],
+[/^Fulfilled\. Hot (.+) meal served from buffer\.$/,function(m){return"提供済み。予備から温かい"+tm(m[1])+"を提供しました。"}],
+[/^Fulfilled\. Fresh (.+) meal loaded\.$/,function(m){return"提供済み。出来たての"+tm(m[1])+"を積み込みました。"}],
+[/^Seat (.+)$/,function(m){return"座席 "+m[1]}],
+[/^Raised at: (.+)$/,function(m){return"発生時の段階: "+ts(m[1])}],
+[/^Sent during: (.+)$/,function(m){return"送信時の段階: "+ts(m[1])}],
+[/^Note: (.*)$/,function(m){return"メモ: "+m[1]}],
+[/^Buffer stock for (.+): (\d+)$/,function(m){return tm(m[1])+"の予備在庫: "+m[2]}],
+[/^Decrease (.+) stock$/,function(m){return tm(m[1])+"の在庫を減らす"}],
+[/^Increase (.+) stock$/,function(m){return tm(m[1])+"の在庫を増やす"}],
+[/^Too many attempts\. Try again in (\d+) s\.$/,function(m){return"試行回数が多すぎます。"+m[1]+"秒後にもう一度お試しください。"}]];
+Object.assign(TR,{"Preparing for the journey":"旅の準備","At the airport":"空港にて","Boarding now":"ご搭乗中","Your in-flight meal":"機内食のお時間","Arrived in Japan":"日本に到着","Enjoy your meal":"どうぞお召し上がりください","Show this to restaurant staff":"お店のスタッフにお見せください","Hold up your phone so staff can read the Japanese. These are simple starter phrases. For a serious allergy, also ask staff to confirm.":"スマートフォンをスタッフにお見せください。基本的なフレーズです。重いアレルギーがある場合は、スタッフにも確認してもらってください。","Table manners in Japan":"日本のテーブルマナー","Say itadakimasu before you eat and gochisōsama deshita when you finish.":"食べる前に「いただきます」、食べ終わったら「ごちそうさまでした」と言いましょう。","Never stand chopsticks upright in rice, and don\u2019t pass food from chopsticks to chopsticks.":"お箸をご飯に立てたり、箸から箸へ食べ物を渡したりしないでください。","Tipping is not expected. Slurping noodles is fine.":"チップは不要です。麺をすすっても大丈夫です。"});
+Object.assign(TR,{"Draw your omikuji":"おみくじを引く","At Japanese shrines, people draw a paper fortune. Draw one for your trip.":"日本の神社では、紙のおみくじを引きます。旅のおみくじを引いてみましょう。","Draw my fortune":"おみくじを引く","Great blessing":"大吉","Middle blessing":"中吉","Small blessing":"小吉","Blessing":"吉","Future blessing":"末吉","Your meal will arrive hot and right on time.":"お食事は温かく、ちょうどよい時間に届きます。","A delicious surprise is waiting on the next plate.":"次のお皿に、おいしいサプライズが待っています。","Good things come to those who read the menu twice.":"メニューを二度読む人に、よいことが訪れます。","Someone nearby will recommend the perfect dish.":"近くの誰かが、ぴったりの一品を教えてくれます。","A slow start, a wonderful ending. Save room for dessert.":"始まりはゆっくり、終わりは最高。デザートの余裕を残しましょう。"});
+Object.assign(TR,{"Your meal tray":"お食事のトレイ","Rice":"ごはん","Smaller rice portion":"ごはん少なめ","Beans or lentils, no onion or garlic":"豆類、玉ねぎ・にんにくなし","Above-ground vegetables":"地上で育つ野菜","Tofu or vegetable dish":"豆腐または野菜料理","Seasonal vegetables":"旬の野菜","Tofu and vegetables":"豆腐と野菜","Halal chicken or fish":"ハラールの鶏肉または魚","Grilled fish or chicken":"焼き魚または鶏肉","Extra vegetables":"野菜多め","Chicken or fish":"鶏肉または魚","Chef\u2019s main dish":"シェフのメイン料理","Seasonal side":"旬の副菜","Fresh fruit":"新鮮な果物","Low-sugar fruit":"糖分控えめの果物","Illustration only. The airline decides exactly what goes into each meal.":"イメージ図です。各食事の具体的な内容は航空会社が決めます。"});
+Object.assign(TR,{"Eat in Japan":"日本で食べる","Dishes and styles of Japanese food that tend to suit each meal type. Pick a profile to see what to try and what to watch for. These are general suggestions, so always confirm the ingredients when you order.":"それぞれの食事タイプに合いやすい日本料理を紹介します。タイプを選んで、おすすめと注意点を確認してください。一般的な提案ですので、注文の際は必ず原材料をご確認ください。","Watch for:":"ご注意：","Tip:":"ヒント："});
+var SUB=["No onion, garlic or root veg","Other (details to add)","Low sugar","No egg","No restrictions"];
+var SFA=" Buffer stock is 0: needs a premium alternative, or it cannot be fulfilled.";
+function trk(k){if(Object.prototype.hasOwnProperty.call(TR,k))return TR[k];var m,i;
+ for(i=0;i<PAT.length;i++){if(m=k.match(PAT[i][0]))return PAT[i][1](m)}
+ if(k.length>SFA.length&&k.slice(-SFA.length)==SFA)return trk(k.slice(0,-SFA.length))+" 予備在庫が0です。上位の代替食が必要で、そうでなければ提供できません。";
+ if(m=k.match(/^(.+?\.) No (.+) meal is left in the buffer right now, so the crew may offer a premium alternative\.$/))return trk(m[1])+" 現在、予備に"+tm(m[2])+"が残っていないため、乗務員が上位の代替食をご案内する場合があります。";
+ var rest=k;SUB.forEach(function(s){rest=rest.split(s).join("")});
+ if(rest.replace(/[, ]/g,"")==""&&rest!==k){var out=[],r2=k;SUB.forEach(function(s){if(r2.indexOf(s)>-1)out.push(TR[s])});return out.join("、")}
+ return k}
+function tr(s){var k=s.trim();if(!k)return s;var j=trk(k);return j===k?s:s.replace(k,function(){return j})}
+function trText(n){var p=n.parentNode;if(!p||p.nodeName=="TEXTAREA"||p.nodeName=="SCRIPT"||p.nodeName=="STYLE")return;var cur=n.data,o=ORIG.get(n);if(o&&o.ja===cur)return;var j=tr(cur);if(j!==cur){ORIG.set(n,{en:cur,ja:j});n.data=j}}
+function trAttr(e){var a=e.getAttribute&&e.getAttribute("aria-label");if(a&&!e.dataset.en){var j=tr(a);if(j!==a){e.dataset.en=a;e.setAttribute("aria-label",j)}}}
+function walk(r){if(r.nodeType==3){trText(r);return}if(r.nodeType!=1)return;trAttr(r);var w=document.createTreeWalker(r,5),n;while(n=w.nextNode()){if(n.nodeType==3)trText(n);else trAttr(n)}}
+function restore(){var w=document.createTreeWalker(document.body,5),n;while(n=w.nextNode()){if(n.nodeType==3){var o=ORIG.get(n);if(o&&n.data===o.ja)n.data=o.en;ORIG.delete(n)}else if(n.dataset&&n.dataset.en){n.setAttribute("aria-label",n.dataset.en);delete n.dataset.en}}}
+function setLang(l){LANG=l;document.documentElement.lang=l;$("l-en").setAttribute("aria-pressed",l=="en");$("l-ja").setAttribute("aria-pressed",l=="ja");if(l=="ja")walk(document.body);else restore()}
+$("l-en").onclick=function(){setLang("en")};$("l-ja").onclick=function(){setLang("ja")};
+new MutationObserver(function(ms){if(LANG!="ja")return;ms.forEach(function(m){if(m.type=="characterData")trText(m.target);else m.addedNodes.forEach(walk)})}).observe(document.body,{childList:true,subtree:true,characterData:true});
+</script></body></html>
